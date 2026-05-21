@@ -14,14 +14,14 @@ export const createNodeIcon = (signalClass: JunctionNode['signalClass']) => {
 
   return L.divIcon({
     className: '',
-    iconSize: [26, 34],
-    iconAnchor: [13, 32],
-    popupAnchor: [0, -28],
+    iconSize: [36, 48],
+    iconAnchor: [18, 44],
+    popupAnchor: [0, -40],
     html: `
-      <div style="position:relative;width:26px;height:34px;transform:translateY(-2px);">
-        <div style="position:absolute;left:50%;top:1px;width:22px;height:22px;transform:translateX(-50%);border-radius:9999px;background:${color};border:2px solid rgba(255,255,255,0.96);box-shadow:0 10px 18px rgba(15,23,42,0.22);"></div>
-        <div style="position:absolute;left:50%;top:7px;width:8px;height:8px;transform:translateX(-50%);border-radius:9999px;background:rgba(255,255,255,0.96);"></div>
-        <div style="position:absolute;left:50%;bottom:0;width:0;height:0;transform:translateX(-50%);border-left:7px solid transparent;border-right:7px solid transparent;border-top:10px solid ${color};filter:drop-shadow(0 4px 6px rgba(15,23,42,0.15));"></div>
+      <div style="position:relative;width:36px;height:48px;transform:translateY(-4px);">
+        <div style="position:absolute;left:50%;top:1px;width:30px;height:30px;transform:translateX(-50%);border-radius:9999px;background:${color};border:3px solid rgba(255,255,255,0.98);box-shadow:0 14px 24px rgba(15,23,42,0.28);"></div>
+        <div style="position:absolute;left:50%;top:10px;width:11px;height:11px;transform:translateX(-50%);border-radius:9999px;background:rgba(255,255,255,0.98);"></div>
+        <div style="position:absolute;left:50%;bottom:0;width:0;height:0;transform:translateX(-50%);border-left:10px solid transparent;border-right:10px solid transparent;border-top:14px solid ${color};filter:drop-shadow(0 5px 8px rgba(15,23,42,0.16));"></div>
       </div>
     `,
   });

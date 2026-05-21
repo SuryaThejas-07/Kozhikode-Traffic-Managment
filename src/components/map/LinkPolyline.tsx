@@ -4,11 +4,21 @@ import { buildLinkPath } from '../../lib/traffic';
 import { junctions } from '../../data/trafficNetwork';
 import type { LinkState, RoadLink } from '../../types/traffic';
 
+type HoverMetric = { label: string; value: string };
+type HoverPayload = { title: string; body?: string; metrics?: HoverMetric[]; x: number; y: number };
+
 const nodeMap = Object.fromEntries(junctions.map((node) => [node.id, node]));
 
-export function LinkPolyline({ link, state, onHover, onSelect }: { link: RoadLink; state: LinkState; onHover: (payload: { title: string; body: string; x: number; y: number } | null) => void; onSelect: (id: string) => void }) {
+export function LinkPolyline({ link, state, onHover, onSelect }: { link: RoadLink; state: LinkState; onHover: (payload: HoverPayload | null) => void; onSelect: (id: string) => void }) {
   const path = useMemo(() => buildLinkPath(link, nodeMap), [link]);
-  const hoverBody = `Flow ${Math.round(state.speed)} km/h · Queue ${Math.round(state.queue)} m · Traffic ${state.los} · Load ${Math.round(state.volume)} veh/hr · Predicted ${Math.round(state.predicted_speed_15m)} km/h`;
+  const hoverMetrics = [
+    { label: 'Speed', value: `${state.speed.toFixed(1)} km/h` },
+    { label: 'Volume', value: `${Math.round(state.volume)} veh/hr` },
+    { label: 'Queue', value: `${Math.round(state.queue)} m` },
+    { label: 'LOS', value: state.los },
+    { label: 'Pred +15m', value: `${Math.round(state.predicted_speed_15m)} km/h` },
+    { label: 'AI conf.', value: `${Math.round(state.ai_confidence * 100)}%` },
+  ];
 
   return (
     <Polyline
@@ -24,11 +34,11 @@ export function LinkPolyline({ link, state, onHover, onSelect }: { link: RoadLin
         click: () => onSelect(link.id),
         mouseover: (event) => {
           const point = event.target._map.latLngToContainerPoint(event.latlng);
-          onHover({ title: link.name, body: `${link.corridor} · ${hoverBody}`, x: point.x, y: point.y });
+          onHover({ title: link.corridor, body: link.name, x: point.x, y: point.y, metrics: hoverMetrics });
         },
         mousemove: (event) => {
           const point = event.target._map.latLngToContainerPoint(event.latlng);
-          onHover({ title: link.name, body: `${link.corridor} · ${hoverBody}`, x: point.x, y: point.y });
+          onHover({ title: link.corridor, body: link.name, x: point.x, y: point.y, metrics: hoverMetrics });
         },
         mouseout: () => onHover(null),
       }}

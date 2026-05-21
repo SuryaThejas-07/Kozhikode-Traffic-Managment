@@ -1,15 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { cn } from '../../lib/cn';
-
-const items = [
-  { to: '/', label: 'Live Command Center', short: 'Command' },
-  { to: '/measures', label: 'Measures', short: 'Measures' },
-  { to: '/forecast', label: 'Predictive Forecasting', short: 'Forecast' },
-  { to: '/analytics', label: 'Analytics & Insights', short: 'Insights' },
-  { to: '/incident-response', label: 'Incident Response', short: 'Response' },
-  { to: '/event-management', label: 'Event Traffic Management', short: 'Events' },
-  { to: '/monitoring', label: 'System Monitoring', short: 'Health' },
-];
+import { sidebarRoutes } from '../../lib/appRoutes';
 
 export function Sidebar() {
   return (
@@ -23,7 +14,7 @@ export function Sidebar() {
       </div>
 
       <nav className="mt-6 space-y-2">
-        {items.map((item) => (
+        {sidebarRoutes.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}

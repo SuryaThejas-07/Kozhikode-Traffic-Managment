@@ -3,16 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { useThemeStore } from '../../store/theme.store';
 import { useTrafficStore } from '../../store/traffic.store';
 import { Badge } from '../ui/Badge';
-
-const pages = [
-  { to: '/command-center', label: 'Command Center' },
-  { to: '/measures', label: 'Measures' },
-  { to: '/forecasting', label: 'Forecasting' },
-  { to: '/analytics', label: 'Analytics' },
-  { to: '/incidents', label: 'Incidents' },
-  { to: '/events', label: 'Events' },
-  { to: '/system-admin', label: 'System Admin' },
-];
+import { topNavRoutes } from '../../lib/appRoutes';
 
 export function TopNav() {
   const { theme, setTheme } = useThemeStore();
@@ -31,7 +22,7 @@ export function TopNav() {
       </div>
 
       <nav className="hidden items-center gap-5 lg:flex">
-        {pages.map((page) => (
+        {topNavRoutes.map((page) => (
           <NavLink
             key={page.to}
             to={page.to}

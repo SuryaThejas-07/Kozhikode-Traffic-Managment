@@ -8,21 +8,22 @@ import { Analytics } from './pages/Analytics';
 import { Incidents } from './pages/Incidents';
 import { EventTrafficPage } from './pages/EventTrafficPage';
 import { SystemAdmin } from './pages/SystemAdmin';
+import { appRoutes } from './lib/appRoutes';
 
 export default function App() {
   return (
     <ErrorBoundary>
       <Routes>
         <Route element={<KUTISShell />}>
-          <Route path="/" element={<Navigate to="/command-center" replace />} />
-          <Route path="/command-center" element={<CommandCenter />} />
-          <Route path="/measures" element={<Measures />} />
-          <Route path="/forecasting" element={<Forecasting />} />
-          <Route path="/analytics" element={<Analytics />} />
-          <Route path="/incidents" element={<Incidents />} />
-          <Route path="/events" element={<EventTrafficPage />} />
-          <Route path="/system-admin" element={<SystemAdmin />} />
-          <Route path="*" element={<Navigate to="/command-center" replace />} />
+          <Route path="/" element={<Navigate to={appRoutes.commandCenter} replace />} />
+          <Route path={appRoutes.commandCenter} element={<CommandCenter />} />
+          <Route path={appRoutes.measures} element={<Measures />} />
+          <Route path={appRoutes.forecasting} element={<Forecasting />} />
+          <Route path={appRoutes.analytics} element={<Analytics />} />
+          <Route path={appRoutes.incidents} element={<Incidents />} />
+          <Route path={appRoutes.events} element={<EventTrafficPage />} />
+          <Route path={appRoutes.systemAdmin} element={<SystemAdmin />} />
+          <Route path="*" element={<Navigate to={appRoutes.commandCenter} replace />} />
         </Route>
       </Routes>
     </ErrorBoundary>

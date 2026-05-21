@@ -17,10 +17,6 @@ interface TrafficMapProps {
 }
 
 const CENTER: [number, number] = [11.2588, 75.7804];
-const BOUNDS: [[number, number], [number, number]] = [
-  [11.246, 75.776],
-  [11.2635, 75.7938],
-];
 
 const roadWidthByClass: Record<RoadLink['roadClass'], number> = {
   arterial: 10,
@@ -79,6 +75,8 @@ export function TrafficMap({ className, roads = baseRoads, junctions = baseJunct
   const tick = useTrafficStore((state) => state.clockTick);
   const selectedJunctionId = useTrafficStore((state) => state.selectedJunctionId);
   const setSelectedJunctionId = useTrafficStore((state) => state.setSelectedJunctionId);
+  const selectedLinkId = useTrafficStore((state) => state.selectedLinkId);
+  const setSelectedLinkId = useTrafficStore((state) => state.setSelectedLinkId);
   const searchQuery = useTrafficStore((state) => state.searchQuery);
   const activeEventId = useTrafficStore((state) => state.selectedEventId);
 
@@ -112,6 +110,8 @@ export function TrafficMap({ className, roads = baseRoads, junctions = baseJunct
   );
 
   const activeJunction = junctionFrames.find((item) => item.junction.id === selectedJunctionId) ?? junctionFrames[0];
+  const selectedRoad = filteredRoads.find((road) => road.id === selectedLinkId) ?? filteredRoads[0];
+  const selectedRoadFrame = roadFrames.find((item) => item.road.id === selectedRoad?.id)?.frame ?? roadFrames[0]?.frame;
 
   return (
     <div className={cn('relative overflow-hidden rounded-3xl border border-slate-200 bg-slate-950 shadow-panel', className)} style={{ height }}>
@@ -119,8 +119,6 @@ export function TrafficMap({ className, roads = baseRoads, junctions = baseJunct
         center={CENTER}
         zoom={14}
         minZoom={13}
-        maxBounds={BOUNDS}
-        maxBoundsViscosity={1}
         scrollWheelZoom
         doubleClickZoom
         dragging
@@ -158,15 +156,20 @@ export function TrafficMap({ className, roads = baseRoads, junctions = baseJunct
                 lineJoin: 'round',
                 dashArray: road.eventSensitive && activeEventId === 'event-ems-match' ? '8 10' : undefined,
               }}
-              eventHandlers={interactive ? { click: () => setSelectedJunctionId(road.to) } : undefined}
+              eventHandlers={interactive ? { click: () => { setSelectedLinkId(road.id); setSelectedJunctionId(road.to); } } : undefined}
             >
               <Tooltip direction="top" sticky>
-                <div className="space-y-1 text-sm leading-5">
-                  <div className="text-base font-semibold text-slate-950">{road.name}</div>
-                  <div>{road.corridor}</div>
-                  <div>Congestion {Math.round(frame.congestionIndex * 100)}%</div>
-                  <div>Speed {frame.speed} km/h</div>
-                  <div>Queue {frame.queueLength} m</div>
+                <div className="min-w-[220px] space-y-1.5 text-sm leading-5">
+                  <div className="text-base font-semibold text-slate-950">{road.corridor}</div>
+                  <div className="text-xs uppercase tracking-[0.2em] text-slate-500">{road.name}</div>
+                  <div className="grid grid-cols-[1fr_auto] gap-3 text-[12px] text-slate-700">
+                    <span>Speed</span><span className="font-medium">{frame.speed} km/h</span>
+                    <span>Volume</span><span className="font-medium">{Math.round(frame.volume)} veh/hr</span>
+                    <span>Queue</span><span className="font-medium">{frame.queueLength} m</span>
+                    <span>LOS</span><span className="font-medium">{frame.los}</span>
+                    <span>Pred +15m</span><span className="font-medium">{Math.round(frame.predicted_speed_15m)} km/h</span>
+                    <span>AI conf.</span><span className="font-medium">{Math.round(frame.ai_confidence * 100)}%</span>
+                  </div>
                 </div>
               </Tooltip>
             </Polyline>
@@ -245,6 +248,23 @@ export function TrafficMap({ className, roads = baseRoads, junctions = baseJunct
           <div><span className="inline-block h-2.5 w-2.5 rounded-full bg-red-500" /> Severe</div>
         </div>
       </div>
+
+      {selectedRoad && selectedRoadFrame ? (
+        <div className="pointer-events-none absolute left-4 bottom-4 z-20 w-[min(320px,calc(100vw-2rem))]">
+          <div className="rounded-2xl border border-slate-800 bg-slate-950/95 px-4 py-3 text-slate-100 shadow-xl shadow-black/40 backdrop-blur-md">
+            <div className="text-[14px] font-semibold leading-5 text-amber-300">{selectedRoad.corridor}</div>
+            <div className="text-[11px] uppercase tracking-[0.2em] text-slate-400">{selectedRoad.name}</div>
+            <div className="mt-3 grid grid-cols-[1fr_auto] gap-x-3 gap-y-1 text-[12px] leading-5 text-slate-300">
+              <span>Speed</span><span className="font-medium text-slate-100">{selectedRoadFrame.speed} km/h</span>
+              <span>Volume</span><span className="font-medium text-slate-100">{Math.round(selectedRoadFrame.volume)} veh/hr</span>
+              <span>Queue</span><span className="font-medium text-slate-100">{selectedRoadFrame.queueLength} m</span>
+              <span>LOS</span><span className="font-medium text-slate-100">{selectedRoadFrame.los}</span>
+              <span>Pred +15m</span><span className="font-medium text-slate-100">{Math.round(selectedRoadFrame.predicted_speed_15m)} km/h</span>
+              <span>AI conf.</span><span className="font-medium text-slate-100">{Math.round(selectedRoadFrame.ai_confidence * 100)}%</span>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

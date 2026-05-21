@@ -5,6 +5,7 @@ import { MetricCard } from '../components/ui/MetricCard';
 import { Panel } from '../components/ui/Panel';
 import { events } from '../data/trafficNetwork';
 import { mockApi } from '../data/mockApi';
+import { selectEvent } from '../lib/trafficSelectors';
 import { useTrafficStore } from '../store/useTrafficStore';
 
 export function EventTrafficPage() {
@@ -16,7 +17,7 @@ export function EventTrafficPage() {
     mockApi.getEvents().then(setEventList);
   }, []);
 
-  const selectedEvent = eventList.find((event) => event.id === selectedEventId) ?? eventList[0];
+  const selectedEvent = selectEvent(eventList, selectedEventId);
   const crowdSeries = [
     { zone: 'Gate A', crowd: 82, parking: 74, busLoad: 62 },
     { zone: 'Gate B', crowd: 68, parking: 58, busLoad: 70 },
