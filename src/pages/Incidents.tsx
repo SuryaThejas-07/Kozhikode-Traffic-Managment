@@ -9,8 +9,8 @@ export function Incidents() {
 
   return (
     <div className="absolute inset-0 flex gap-3 p-3">
-      <div className="pointer-events-none w-[272px]">
-        <Panel title="Incidents" subtitle="Response queue" className="pointer-events-auto h-full overflow-y-auto">
+      <div className="pointer-events-none w-[272px] min-w-0">
+        <Panel title="Incidents" subtitle="Response queue" className="pointer-events-auto h-[calc(100vh-96px)] overflow-y-auto">
           <div className="space-y-2">
             {incidents.map((incident) => (
               <button key={incident.id} type="button" onClick={() => setSelectedIncidentId(incident.id)} className="w-full rounded-[6px] border border-[var(--border)] p-3 text-left text-[12px]">
@@ -25,10 +25,10 @@ export function Incidents() {
         </Panel>
       </div>
 
-      <div className="flex-1" />
+      <div className="flex-1 min-w-0" />
 
-      <div className="pointer-events-none w-[272px]">
-        <Panel title="Control Panel" subtitle="Override and broadcast" className="pointer-events-auto h-full overflow-y-auto">
+      <div className="pointer-events-none w-[272px] min-w-0">
+        <Panel title="Control Panel" subtitle="Override and broadcast" className="pointer-events-auto h-[calc(100vh-96px)] overflow-y-auto">
           <MetricCard label="Officers" value="6 on duty" />
           <MetricCard label="Broadcast" value="Ready" detail="Editable message queue" />
         </Panel>

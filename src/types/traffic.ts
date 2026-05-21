@@ -49,6 +49,8 @@ export interface NodeState {
 }
 
 export interface Recommendation {
+  id: string;
+  junctionId: string;
   action: string;
   reduction_pct: number;
   confidence: number;

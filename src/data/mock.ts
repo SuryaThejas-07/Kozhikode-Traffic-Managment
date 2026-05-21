@@ -27,10 +27,10 @@ export const DEFAULT_FORECAST: ForecastPoint[] = [5, 10, 15, 20, 25].map((horizo
 }));
 
 export const defaultRecommendations: Recommendation[] = [
-  { action: 'Increase green phase by 20 seconds', reduction_pct: 32, confidence: 0.96, priority: 'critical', status: 'pending', new_green_n: 42, new_green_s: 40, new_green_e: 18, new_green_w: 18 },
-  { action: 'Divert traffic via alternate corridor', reduction_pct: 24, confidence: 0.9, priority: 'high', status: 'pending', new_green_n: 30, new_green_s: 30, new_green_e: 20, new_green_w: 20 },
-  { action: 'Restrict heavy vehicle entry', reduction_pct: 18, confidence: 0.88, priority: 'high', status: 'approved', new_green_n: 28, new_green_s: 28, new_green_e: 24, new_green_w: 24 },
-  { action: 'Activate emergency priority mode', reduction_pct: 37, confidence: 0.98, priority: 'critical', status: 'pending', new_green_n: 50, new_green_s: 46, new_green_e: 16, new_green_w: 16 },
+  { id: 'rec-01', junctionId: 'stadium_jn', action: 'Increase green phase by 20 seconds', reduction_pct: 32, confidence: 0.96, priority: 'critical', status: 'pending', new_green_n: 42, new_green_s: 40, new_green_e: 18, new_green_w: 18 },
+  { id: 'rec-02', junctionId: 'palayam_jn', action: 'Divert traffic via alternate corridor', reduction_pct: 24, confidence: 0.9, priority: 'high', status: 'pending', new_green_n: 30, new_green_s: 30, new_green_e: 20, new_green_w: 20 },
+  { id: 'rec-03', junctionId: 'bus_stand_jn', action: 'Restrict heavy vehicle entry', reduction_pct: 18, confidence: 0.88, priority: 'high', status: 'approved', new_green_n: 28, new_green_s: 28, new_green_e: 24, new_green_w: 24 },
+  { id: 'rec-04', junctionId: 'stadium_jn', action: 'Activate emergency priority mode', reduction_pct: 37, confidence: 0.98, priority: 'critical', status: 'pending', new_green_n: 50, new_green_s: 46, new_green_e: 16, new_green_w: 16 },
 ];
 
 export const getSnapshot = (tick = 0, loadFactor = 0) => {

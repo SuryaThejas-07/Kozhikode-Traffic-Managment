@@ -39,9 +39,9 @@ interface TrafficStore {
   setEventEnabled: (value: boolean) => void;
   setEventDispersal: (value: 0 | 30 | 60) => void;
   setHiddenMap: (hidden: boolean) => void;
-  approveRecommendation: (nodeId: string) => void;
-  rejectRecommendation: (nodeId: string) => void;
-  previewRecommendation: (nodeId: string) => void;
+  approveRecommendation: (junctionId: string) => void;
+  rejectRecommendation: (junctionId: string) => void;
+  previewRecommendation: (junctionId: string) => void;
   tickNow: () => void;
 }
 
@@ -91,23 +91,23 @@ export const useTrafficStore = create<TrafficStore>((set, get) => ({
   setEventEnabled: (eventEnabled) => set({ eventEnabled }),
   setEventDispersal: (eventDispersal) => set({ eventDispersal }),
   setHiddenMap: (hiddenMap) => set({ hiddenMap }),
-  approveRecommendation: (nodeId) =>
+  approveRecommendation: (junctionId) =>
     set((state) => ({
       recommendations: state.recommendations.map((recommendation) =>
-        recommendation.action.includes(nodeId)
+        recommendation.junctionId === junctionId
           ? { ...recommendation, status: 'approved' as const }
           : recommendation,
       ),
     })),
-  rejectRecommendation: (nodeId) =>
+  rejectRecommendation: (junctionId) =>
     set((state) => ({
       recommendations: state.recommendations.map((recommendation) =>
-        recommendation.action.includes(nodeId)
+        recommendation.junctionId === junctionId
           ? { ...recommendation, status: 'rejected' as const }
           : recommendation,
       ),
     })),
-  previewRecommendation: (nodeId) => set({ activeLinkId: LINKS.find((link) => link.from === nodeId || link.to === nodeId)?.id ?? null }),
+  previewRecommendation: (junctionId) => set({ activeLinkId: LINKS.find((link) => link.from === junctionId || link.to === junctionId)?.id ?? null }),
   tickNow: () => {
     const tick = get().tick + 1;
     set({ tick });

@@ -87,5 +87,12 @@ export const buildLinkState = (link: LinkDefinition, nodes: Record<string, NodeD
 export const buildLinkPath = (link: LinkDefinition, nodes: Record<string, NodeDefinition>) => {
   const from = nodes[link.from];
   const to = nodes[link.to];
-  return [[from.lat, from.lng], ...link.waypoints, [to.lat, to.lng]] as Array<[number, number]>;
+  const normalize = (pt: [number, number]) => {
+    // If first value looks like longitude (outside -90..90), swap to [lat,lng]
+    if (Math.abs(pt[0]) > 90 && Math.abs(pt[1]) <= 90) return [pt[1], pt[0]] as [number, number];
+    // Otherwise assume it's already [lat,lng]
+    return pt;
+  };
+
+  return [[from.lat, from.lng], ...link.waypoints.map(normalize), [to.lat, to.lng]] as Array<[number, number]>;
 };

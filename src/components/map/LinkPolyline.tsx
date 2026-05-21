@@ -15,8 +15,8 @@ export function LinkPolyline({ link, state, onHover, onSelect }: { link: RoadLin
       positions={path}
       pathOptions={{
         color: '#f97316',
-        weight: 4,
-        opacity: 0.85,
+        weight: 7,
+        opacity: 0.92,
         lineCap: 'round',
         lineJoin: 'round',
       }}

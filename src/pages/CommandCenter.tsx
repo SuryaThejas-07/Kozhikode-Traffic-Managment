@@ -19,7 +19,8 @@ export function CommandCenter() {
 
   return (
     <div className="absolute inset-0 overflow-hidden">
-      <div className="pointer-events-none absolute left-3 top-3 bottom-16 w-[280px] space-y-3 overflow-y-auto pr-1">
+      <div className="pointer-events-none absolute inset-y-3 left-3 w-[280px] overflow-hidden pr-1">
+        <div className="flex h-full flex-col gap-3 overflow-y-auto pb-20 pr-1">
         <Panel title="KUTIS" subtitle="Kozhikode Urban Traffic Intelligence System" className="pointer-events-auto">
           <div className="text-[12px] leading-5 text-[var(--muted)]">Production traffic command center. Real data geometry. No decorative effects.</div>
           <div className="mt-3 flex flex-wrap gap-2 text-[11px]">
@@ -57,9 +58,11 @@ export function CommandCenter() {
             <MetricCard label="Selected node" value={selectedNodeId} detail={`Queue ${selectedNode?.q_n ?? 0}/${selectedNode?.q_s ?? 0}/${selectedNode?.q_e ?? 0}/${selectedNode?.q_w ?? 0}`} />
           </div>
         </Panel>
+        </div>
       </div>
 
-      <div className="pointer-events-none absolute right-3 top-3 bottom-16 w-[320px] space-y-3 overflow-y-auto pr-1">
+      <div className="pointer-events-none absolute inset-y-3 right-3 w-[320px] overflow-hidden pr-1">
+        <div className="flex h-full flex-col gap-3 overflow-y-auto pb-20 pr-1">
         <Panel title={`Live Incidents (${incidents.length})`} subtitle="Operational alerts" className="pointer-events-auto">
           <div className="space-y-2">
             {incidents.map((incident) => (
@@ -100,9 +103,10 @@ export function CommandCenter() {
             ))}
           </div>
         </Panel>
+        </div>
       </div>
 
-      <div className="pointer-events-none absolute left-1/2 bottom-18 w-[min(820px,calc(100vw-620px))] -translate-x-1/2 rounded-[10px] border border-[var(--border)] bg-[var(--surface)] p-3 text-[12px]">
+      <div className="pointer-events-none absolute left-1/2 bottom-4 w-[min(820px,calc(100vw-620px))] -translate-x-1/2 rounded-[10px] border border-[var(--border)] bg-[var(--surface)] p-3 text-[12px] shadow-lg shadow-black/10">
         Selected node: {selectedNodeId} · Phase {selectedNode?.phase?.toUpperCase()} · Queue {selectedNode?.q_n}/{selectedNode?.q_s}/{selectedNode?.q_e}/{selectedNode?.q_w}
       </div>
     </div>

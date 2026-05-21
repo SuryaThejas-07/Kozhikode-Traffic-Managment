@@ -3,7 +3,7 @@ import { cn } from '../../lib/cn';
 
 const items = [
   { to: '/', label: 'Live Command Center', short: 'Command' },
-  { to: '/ai-engine', label: 'AI Traffic Engine', short: 'AI' },
+  { to: '/measures', label: 'Measures', short: 'Measures' },
   { to: '/forecast', label: 'Predictive Forecasting', short: 'Forecast' },
   { to: '/analytics', label: 'Analytics & Insights', short: 'Insights' },
   { to: '/incident-response', label: 'Incident Response', short: 'Response' },

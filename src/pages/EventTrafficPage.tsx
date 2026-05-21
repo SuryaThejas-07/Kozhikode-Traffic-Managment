@@ -25,7 +25,7 @@ export function EventTrafficPage() {
   ];
 
   return (
-    <div className="space-y-5">
+    <div className="pointer-events-auto space-y-5">
       <section className="grid gap-4 md:grid-cols-4">
         {[
           { label: 'Planned events', value: `${eventList.length}`, detail: 'Live and scheduled special operations' },

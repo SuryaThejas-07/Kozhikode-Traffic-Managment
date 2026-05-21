@@ -1,7 +1,6 @@
-import { Popup, CircleMarker } from 'react-leaflet';
+import { Marker, Popup } from 'react-leaflet';
 import type { JunctionNode } from '../../types/traffic';
-
-const BLUE = '#3b82f6';
+import { createNodeIcon } from './nodeIcon';
 
 export function NodeMarker({
   node,
@@ -15,15 +14,9 @@ export function NodeMarker({
   const hoverBody = `${node.zone} · ${node.type} · ${node.signalClass === 'bottleneck' ? 'Hotspot' : node.signalClass === 'transit' ? 'Transit hub' : node.signalClass === 'event-aware' ? 'Event-sensitive' : 'Signalized'} · Queue ${node.queueLength} m · Speed ${Math.round(node.speed)} km/h · Delay ${Math.round(node.delay)} s`;
 
   return (
-    <CircleMarker
-      center={[node.lat, node.lng]}
-      radius={8}
-      pathOptions={{
-        color: BLUE,
-        fillColor: BLUE,
-        fillOpacity: 0.9,
-        weight: 2,
-      }}
+    <Marker
+      position={[node.lat, node.lng]}
+      icon={createNodeIcon(node.signalClass)}
       eventHandlers={{
         click: () => onSelect(node.id),
         mouseover: (event) => {
@@ -48,12 +41,12 @@ export function NodeMarker({
       }}
     >
       <Popup>
-        <div className="text-[12px] leading-5 text-[var(--text)]">
-          <div className="font-medium">📍 {node.name}</div>
+        <div className="text-[13px] leading-5 text-[var(--text)]">
+          <div className="font-semibold">📍 {node.name}</div>
           <div className="text-[var(--muted)]">{node.zone}</div>
           <div className="text-[var(--muted)]">{hoverBody}</div>
         </div>
       </Popup>
-    </CircleMarker>
+    </Marker>
   );
 }

@@ -10,7 +10,7 @@ import { NodeMarker } from './NodeMarker';
 import { LinkTooltip } from './LinkTooltip';
 import { Badge } from '../ui/Badge';
 
-const CENTER: [number, number] = [11.2545, 75.7848];
+const CENTER: [number, number] = [11.2588, 75.7804];
 const BOUNDS: [[number, number], [number, number]] = [
   [11.2468, 75.7774],
   [11.2626, 75.7932],
@@ -61,6 +61,8 @@ export function KUTISMap({ hidden = false }: { hidden?: boolean }) {
   const setSelectedLinkId = useTrafficStore((state) => state.setSelectedLinkId);
   const linkStates = useTrafficStore((state) => state.linkStates);
 
+  const ready = Object.keys(linkStates).length >= baseRoads.length;
+
   const [hover, setHover] = useState<{ title: string; body: string; x: number; y: number } | null>(null);
   const mapClasses = hidden ? 'hidden' : 'block';
 
@@ -72,13 +74,13 @@ export function KUTISMap({ hidden = false }: { hidden?: boolean }) {
 
         <LayerControl />
 
-        {layers.traffic &&
+        {ready && layers.traffic &&
           baseRoads.map((link) => {
             const state = linkStates[link.id];
             return <LinkPolyline key={link.id} link={link} state={state} onHover={setHover} onSelect={setSelectedLinkId} />;
           })}
 
-        {layers.nodes &&
+        {ready && layers.nodes &&
           baseJunctions.map((node) => {
             return <NodeMarker key={node.id} node={node} onSelect={setSelectedNodeId} onHover={setHover} />;
           })}

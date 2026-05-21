@@ -28,9 +28,9 @@ export function Forecasting() {
       <div className="w-[55%] min-w-0" />
       <div className="pointer-events-none w-[45%] p-3">
         <Panel title="Predictive Traffic Forecasting" subtitle="Future simulation" className="pointer-events-auto h-[calc(100vh-96px)] overflow-y-auto">
-          <div className="grid grid-cols-5 gap-2 text-[12px]">
+          <div className="flex flex-wrap gap-2 text-[12px]">
             {[5, 10, 15, 20, 25].map((value) => (
-              <button key={value} type="button" onClick={() => setHorizon(value as 5 | 10 | 15 | 20 | 25)} className={`rounded-[6px] border px-3 py-2 ${horizon === value ? 'border-[var(--accent)] bg-[color:color-mix(in_srgb,var(--accent)_12%,transparent)]' : 'border-[var(--border)]'}`}>
+              <button key={value} type="button" onClick={() => setHorizon(value as 5 | 10 | 15 | 20 | 25)} className={`min-w-0 flex-1 rounded-[6px] border px-3 py-2 ${horizon === value ? 'border-[var(--accent)] bg-[color:color-mix(in_srgb,var(--accent)_12%,transparent)]' : 'border-[var(--border)]'}`}>
                 +{value}
               </button>
             ))}
@@ -47,7 +47,8 @@ export function Forecasting() {
             </label>
           </div>
 
-          <div className="mt-4 grid gap-2">
+          <div className="mt-4 overflow-x-auto">
+            <div className="min-w-[560px] grid gap-2">
             {corridorRows.map((row) => (
               <div key={row} className="flex items-center gap-2 text-[11px]">
                 <div className="w-[100px] truncate text-[var(--muted)]">{row}</div>
@@ -56,6 +57,7 @@ export function Forecasting() {
                 ))}
               </div>
             ))}
+            </div>
           </div>
 
           <div className="mt-5 h-64">

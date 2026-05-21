@@ -1,10 +1,12 @@
 import { useMemo } from 'react';
-import { Circle, CircleMarker, MapContainer, Polyline, Popup, Tooltip, TileLayer } from 'react-leaflet';
+import { Circle, CircleMarker, MapContainer, Marker, Polyline, Popup, Tooltip, TileLayer } from 'react-leaflet';
 import { junctions as baseJunctions, roads as baseRoads } from '../../data/trafficNetwork';
+import { buildLinkPath } from '../../lib/traffic';
 import { simulateJunctionFrame, simulateRoadFrame, roadPressure } from '../../lib/simulation';
 import { cn } from '../../lib/cn';
 import { useTrafficStore } from '../../store/useTrafficStore';
 import type { JunctionNode, RoadLink } from '../../types/traffic';
+import { createNodeIcon } from './nodeIcon';
 
 interface TrafficMapProps {
   className?: string;
@@ -14,18 +16,18 @@ interface TrafficMapProps {
   interactive?: boolean;
 }
 
-const CENTER: [number, number] = [11.2545, 75.7848];
+const CENTER: [number, number] = [11.2588, 75.7804];
 const BOUNDS: [[number, number], [number, number]] = [
   [11.246, 75.776],
   [11.2635, 75.7938],
 ];
 
 const roadWidthByClass: Record<RoadLink['roadClass'], number> = {
-  arterial: 6,
-  collector: 4,
-  connector: 4,
-  bypass: 6,
-  transit: 6,
+  arterial: 10,
+  collector: 8,
+  connector: 7,
+  bypass: 10,
+  transit: 10,
 };
 
 const roadBaseColorByClass: Record<RoadLink['roadClass'], string> = {
@@ -139,7 +141,7 @@ export function TrafficMap({ className, roads = baseRoads, junctions = baseJunct
 
           if (!from || !to) return null;
 
-          const path = [[from.lat, from.lng], ...road.waypoints, [to.lat, to.lng]] as Array<[number, number]>;
+          const path = buildLinkPath(road, Object.fromEntries(junctions.map((n) => [n.id, n])));
           const severityColor = frame.congestionIndex >= 0.72 ? '#ff3b30' : frame.congestionIndex >= 0.52 ? '#ffaa33' : '#34c759';
           const baseColor = roadBaseColorByClass[road.roadClass];
           const isHighlighted = frame.congestionIndex >= 0.58 || selectedJunctionId === road.from || selectedJunctionId === road.to;
@@ -159,8 +161,8 @@ export function TrafficMap({ className, roads = baseRoads, junctions = baseJunct
               eventHandlers={interactive ? { click: () => setSelectedJunctionId(road.to) } : undefined}
             >
               <Tooltip direction="top" sticky>
-                <div className="space-y-1 text-xs">
-                  <div className="font-semibold text-slate-950">{road.name}</div>
+                <div className="space-y-1 text-sm leading-5">
+                  <div className="text-base font-semibold text-slate-950">{road.name}</div>
                   <div>{road.corridor}</div>
                   <div>Congestion {Math.round(frame.congestionIndex * 100)}%</div>
                   <div>Speed {frame.speed} km/h</div>
@@ -175,7 +177,7 @@ export function TrafficMap({ className, roads = baseRoads, junctions = baseJunct
           const from = junctions.find((junction) => junction.id === road.from);
           const to = junctions.find((junction) => junction.id === road.to);
           if (!from || !to) return null;
-          const path = [[from.lat, from.lng], ...road.waypoints, [to.lat, to.lng]] as Array<[number, number]>;
+          const path = buildLinkPath(road, Object.fromEntries(junctions.map((n) => [n.id, n])));
           const vehicle = pointAt(path, tick / 10 + frame.congestionIndex * 0.5);
           return (
             <CircleMarker
@@ -201,21 +203,15 @@ export function TrafficMap({ className, roads = baseRoads, junctions = baseJunct
                 radius={pulse}
                 pathOptions={{ color: tone, fillColor: tone, fillOpacity: 0.08, weight: 0 }}
               />
-              <CircleMarker
+              <Marker
                 key={junction.id}
-                center={[junction.lat, junction.lng]}
-                radius={isActive ? 9 : 8}
-                pathOptions={{
-                  color: '#dbeafe',
-                  weight: isActive ? 3 : 2,
-                  fillColor: tone,
-                  fillOpacity: 0.95,
-                }}
+                position={[junction.lat, junction.lng]}
+                icon={createNodeIcon(junction.signalClass)}
                 eventHandlers={interactive ? { click: () => setSelectedJunctionId(junction.id) } : undefined}
               >
                 <Tooltip direction="top" sticky>
-                  <div className="space-y-1 text-xs">
-                    <div className="font-semibold text-slate-950">{junction.name}</div>
+                  <div className="space-y-1 text-sm leading-5">
+                    <div className="text-base font-semibold text-slate-950">{junction.name}</div>
                     <div>{congestionPct}% traffic</div>
                     <div>Queue {frame.queueLength} m</div>
                     <div>Signal {junction.currentPhase}</div>
@@ -230,7 +226,7 @@ export function TrafficMap({ className, roads = baseRoads, junctions = baseJunct
                     <p>Speed: {frame.speed} km/h</p>
                   </div>
                 </Popup>
-              </CircleMarker>
+              </Marker>
             </>
           );
         })}

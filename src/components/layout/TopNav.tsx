@@ -6,7 +6,7 @@ import { Badge } from '../ui/Badge';
 
 const pages = [
   { to: '/command-center', label: 'Command Center' },
-  { to: '/ai-engine', label: 'AI Engine' },
+  { to: '/measures', label: 'Measures' },
   { to: '/forecasting', label: 'Forecasting' },
   { to: '/analytics', label: 'Analytics' },
   { to: '/incidents', label: 'Incidents' },

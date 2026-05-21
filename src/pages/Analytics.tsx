@@ -24,14 +24,14 @@ export function Analytics() {
   const heatRows = ['Mavoor Road', 'Mini Bypass Road', 'Bank Road', 'SM Street Road', 'Stadium Link Road', 'M.M Ali Road', 'Palayam Road', 'Jail Road'];
 
   return (
-    <div className="absolute inset-0 overflow-y-auto bg-[var(--bg)] p-3">
-      <div className="grid grid-cols-6 gap-3">
-        <MetricCard label="Total vehicles" value={totalVehicles.toLocaleString('en-IN')} />
-        <MetricCard label="Avg speed" value={`${Math.round(avgSpeed)} km/h`} />
-        <MetricCard label="Incidents resolved" value="18" />
-        <MetricCard label="AI accept %" value="87%" />
-        <MetricCard label="Congestion score" value={`${Math.round(congestionScore * 10)}/10`} />
-        <MetricCard label="Signal efficiency" value="81%" />
+    <div className="pointer-events-auto absolute inset-0 h-full min-h-full overflow-y-auto bg-[var(--bg)] p-3">
+      <div className="flex gap-3 overflow-x-auto pb-2">
+        <div className="min-w-[12rem]"><MetricCard label="Total vehicles" value={totalVehicles.toLocaleString('en-IN')} /></div>
+        <div className="min-w-[12rem]"><MetricCard label="Avg speed" value={`${Math.round(avgSpeed)} km/h`} /></div>
+        <div className="min-w-[12rem]"><MetricCard label="Incidents resolved" value="18" /></div>
+        <div className="min-w-[12rem]"><MetricCard label="AI accept %" value="87%" /></div>
+        <div className="min-w-[12rem]"><MetricCard label="Congestion score" value={`${Math.round(congestionScore * 10)}/10`} /></div>
+        <div className="min-w-[12rem]"><MetricCard label="Signal efficiency" value="81%" /></div>
       </div>
 
       <div className="mt-3 grid grid-cols-2 gap-3">
@@ -67,6 +67,7 @@ export function Analytics() {
       </div>
 
       <div className="mt-3 overflow-hidden rounded-[10px] border border-[var(--border)] bg-[var(--surface)]">
+        <div className="overflow-x-auto">
         <div className="grid grid-cols-[90px_repeat(24,minmax(0,1fr))] border-b border-[var(--border)] text-[11px] text-[var(--muted)]">
           <div className="p-2">Corridor</div>
           {Array.from({ length: 24 }, (_, hour) => <div key={hour} className="p-2 text-center">{hour}</div>)}
@@ -80,6 +81,7 @@ export function Analytics() {
             })}
           </div>
         ))}
+        </div>
       </div>
 
       <div className="mt-3 grid grid-cols-2 gap-3">
