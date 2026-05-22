@@ -2,6 +2,7 @@ export type ThemeName = 'light' | 'dark' | 'satellite';
 
 export type NodeType = 'transit_hub' | 'hospital' | 'connector' | 'event_zone' | 'rotary' | 'signalized' | 'commercial' | 'urban' | 'bottleneck';
 export type TrafficState = 'smooth' | 'moderate' | 'heavy' | 'severe' | 'critical';
+export type RoadCondition = TrafficState;
 
 export interface NodeDefinition {
   id: string;

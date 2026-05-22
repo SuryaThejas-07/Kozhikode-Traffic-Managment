@@ -5,19 +5,50 @@ import { MetricCard } from '../components/ui/MetricCard';
 import { Panel } from '../components/ui/Panel';
 import { events } from '../data/trafficNetwork';
 import { mockApi } from '../data/mockApi';
+import { useEventStore } from '../store/event.store';
 import { selectEvent } from '../lib/trafficSelectors';
 import { useTrafficStore } from '../store/useTrafficStore';
 
 export function EventTrafficPage() {
-  const [eventList, setEventList] = useState(events);
+  const eventList = useEventStore((s) => s.events);
+  const addEvent = useEventStore((s) => s.addEvent);
   const selectedEventId = useTrafficStore((state) => state.selectedEventId);
   const setSelectedEventId = useTrafficStore((state) => state.setSelectedEventId);
 
   useEffect(() => {
-    mockApi.getEvents().then(setEventList);
+    // hydrate from mock API once (keeps runtime in sync with data/trafficNetwork seed)
+    mockApi.getEvents().then((items) => {
+      // merge without duplicating ids
+      items.forEach((it) => addEvent(it));
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const selectedEvent = selectEvent(eventList, selectedEventId);
+
+  // Local UI state for add-event form/modal
+  const [showAdd, setShowAdd] = useState(false);
+  const [form, setForm] = useState<{
+    id: string;
+    name: string;
+    category: 'sports' | 'vip' | 'rally' | 'festival' | 'religious';
+    venue: string;
+    impactRadiusKm: number;
+    attendance: number;
+    startTime: string;
+    endTime: string;
+    state: 'scheduled' | 'live' | 'completed';
+  }>({ id: '', name: '', category: 'sports', venue: '', impactRadiusKm: 1.0, attendance: 0, startTime: '', endTime: '', state: 'scheduled' });
+
+  const onAdd = () => {
+    if (!form.id || !form.name) return setError('Provide id and name');
+    if (eventList.some((e) => e.id === form.id)) return setError('An event with this id already exists');
+    // hydrate duplicate-safe
+    addEvent({ ...form });
+    setShowAdd(false);
+    setForm({ id: '', name: '', category: 'sports', venue: '', impactRadiusKm: 1.0, attendance: 0, startTime: '', endTime: '', state: 'scheduled' });
+  };
+  const [error, setError] = useState<string | null>(null);
   const crowdSeries = [
     { zone: 'Gate A', crowd: 82, parking: 74, busLoad: 62 },
     { zone: 'Gate B', crowd: 68, parking: 58, busLoad: 70 },
@@ -39,9 +70,17 @@ export function EventTrafficPage() {
       </section>
 
       <section className="grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
-        <Panel title="Event traffic management" eyebrow="Special event operations">
-          <TrafficMap className="h-[760px]" />
-        </Panel>
+          <Panel title="Event traffic management" eyebrow="Special event operations">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-[var(--muted)]">Interactive event map and operational controls.</div>
+              <div className="space-x-2">
+                <button type="button" onClick={() => setShowAdd(true)} className="rounded-full border px-3 py-1 text-sm">Add event</button>
+              </div>
+            </div>
+            <div className="mt-3">
+              <TrafficMap className="h-[520px] rounded-lg" />
+            </div>
+          </Panel>
 
         <div className="space-y-5">
           <Panel title="Event scenarios" eyebrow="Simulation control">
@@ -68,6 +107,41 @@ export function EventTrafficPage() {
               ))}
             </div>
           </Panel>
+
+          {/* Add event modal - simple inline drawer */}
+          {showAdd ? (
+            <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
+              <div className="absolute inset-0 bg-black/40" onClick={() => setShowAdd(false)} />
+              <div className="relative z-50 w-full max-w-xl p-4">
+                <div className="rounded-lg border bg-white p-4 shadow-lg">
+                  <h3 className="text-lg font-semibold">Add Event</h3>
+                  <div className="mt-3 grid gap-2">
+                    <input placeholder="id (unique)" value={form.id} onChange={(e) => setForm({ ...form, id: e.target.value })} className="border p-2" />
+                    <input placeholder="name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="border p-2" />
+                    <input placeholder="venue" value={form.venue} onChange={(e) => setForm({ ...form, venue: e.target.value })} className="border p-2" />
+                    <div className="flex gap-2">
+                      <input type="datetime-local" value={form.startTime} onChange={(e) => setForm({ ...form, startTime: e.target.value })} className="border p-2 flex-1" />
+                      <input type="datetime-local" value={form.endTime} onChange={(e) => setForm({ ...form, endTime: e.target.value })} className="border p-2 flex-1" />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value as any })} className="border p-2">
+                        <option value="sports">sports</option>
+                        <option value="vip">vip</option>
+                        <option value="rally">rally</option>
+                        <option value="festival">festival</option>
+                      </select>
+                      <input type="number" placeholder="attendance" value={form.attendance} onChange={(e) => setForm({ ...form, attendance: Number(e.target.value) })} className="border p-2 w-36" />
+                    </div>
+                    <div className="flex justify-end gap-2 mt-3">
+                      <button type="button" onClick={() => setShowAdd(false)} className="rounded border px-3 py-1">Cancel</button>
+                      <button type="button" onClick={onAdd} className="rounded bg-blue-600 px-3 py-1 text-white">Add</button>
+                    </div>
+                    {error ? <div className="mt-2 text-sm text-red-600">{error}</div> : null}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : null}
 
           <Panel title={selectedEvent?.name ?? 'Event overview'} eyebrow="Operational simulation">
             <div className="grid gap-4 md:grid-cols-2">

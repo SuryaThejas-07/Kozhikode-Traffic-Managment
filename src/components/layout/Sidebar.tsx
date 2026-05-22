@@ -2,9 +2,28 @@ import { NavLink } from 'react-router-dom';
 import { cn } from '../../lib/cn';
 import { sidebarRoutes } from '../../lib/appRoutes';
 
-export function Sidebar() {
+interface SidebarProps {
+  id?: string;
+  open?: boolean;
+  onClose?: () => void;
+}
+
+export function Sidebar({ open, onClose }: SidebarProps) {
   return (
-    <aside className="flex h-full w-full flex-col border-r border-slate-200 bg-slate-950 px-4 py-5 text-slate-100 lg:w-[288px]">
+    <>
+      {/* mobile backdrop */}
+      {open ? (
+        <div
+          onClick={onClose}
+          className="fixed inset-0 z-40 hidden lg:hidden mobile-drawer-backdrop"
+          aria-hidden
+        />
+      ) : null}
+
+      <aside id={"app-sidebar"} aria-label="Main navigation" className={cn(
+        'flex h-full w-full flex-col border-r border-slate-200 bg-slate-950 px-4 py-5 text-slate-100 lg:w-[288px]',
+        open ? 'fixed left-0 top-0 z-50 h-full w-[84%] max-w-xs transform shadow-2xl lg:relative lg:block' : 'hidden lg:flex'
+      )} aria-hidden={!open && typeof window !== 'undefined' && window.innerWidth < 1024}>
       <div className="rounded-3xl border border-slate-800 bg-slate-900/80 p-4 shadow-2xl shadow-slate-950/20">
         <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-slate-400">Kozhikode District</p>
         <h1 className="mt-2 text-xl font-semibold text-white">Mobility Command Center</h1>
@@ -18,7 +37,7 @@ export function Sidebar() {
           <NavLink
             key={item.to}
             to={item.to}
-            end={item.to === '/'}
+            end={false}
             className={({ isActive }) =>
               cn(
                 'flex items-center justify-between rounded-2xl border px-4 py-3 text-sm transition-colors',
@@ -41,6 +60,7 @@ export function Sidebar() {
           Stadium, Mananchira, Poonthanam, Arayidathupalam, and Palayam.
         </p>
       </div>
-    </aside>
+      </aside>
+    </>
   );
 }

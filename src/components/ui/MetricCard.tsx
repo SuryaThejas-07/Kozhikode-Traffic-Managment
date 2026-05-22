@@ -1,5 +1,5 @@
-export function MetricCard({ label, value, detail, tone = 'default' }: { label: string; value: string; detail?: string; tone?: 'default' | 'success' | 'warn' | 'danger' }) {
-  const toneClass = tone === 'success' ? 'text-[var(--success)]' : tone === 'warn' ? 'text-[var(--warn)]' : tone === 'danger' ? 'text-[var(--danger)]' : 'text-[var(--accent)]';
+export function MetricCard({ label, value, detail, tone = 'default' }: { label: string; value: string; detail?: string; tone?: 'default' | 'success' | 'warn' | 'warning' | 'danger' }) {
+  const toneClass = tone === 'success' ? 'text-[var(--success)]' : tone === 'warn' || tone === 'warning' ? 'text-[var(--warn)]' : tone === 'danger' ? 'text-[var(--danger)]' : 'text-[var(--accent)]';
   return (
     <div className="rounded-[10px] border border-[var(--border)] bg-[var(--surface)] p-4">
       <div className="text-[11px] uppercase tracking-[0.22em] text-[var(--muted)]">{label}</div>

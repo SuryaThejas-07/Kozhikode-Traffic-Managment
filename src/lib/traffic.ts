@@ -1,4 +1,4 @@
-import type { LinkDefinition, LinkState, NodeDefinition, NodeState, TrafficState } from '../types/traffic';
+import type { RoadLink, LinkState, JunctionNode, NodeState, TrafficState } from '../types/traffic';
 
 export const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 export const round1 = (value: number) => Math.round(value * 10) / 10;
@@ -28,16 +28,16 @@ export const getLos = (speed: number) => {
 const hash = (value: string) => value.split('').reduce((sum, char) => sum + char.charCodeAt(0) * 17, 0);
 const wave = (seed: number, factor = 1) => Math.sin(seed * factor) * 0.5 + Math.cos(seed * 0.7 * factor) * 0.5;
 
-export const buildNodeState = (node: NodeDefinition, tick: number): NodeState => {
+export const buildNodeState = (node: JunctionNode, tick: number): NodeState => {
   const seed = hash(node.id) / 100 + tick / 5;
-  const phaseCycle = node.type === 'signalized' ? 72 + (hash(node.id) % 16) : 90 + (hash(node.id) % 25);
+  const phaseCycle = node.signalClass === 'signalized' ? 72 + (hash(node.id) % 16) : 90 + (hash(node.id) % 25);
   const phasePosition = Math.floor((seed * 10) % phaseCycle);
   const phase = phasePosition < phaseCycle * 0.45 ? 'green' : phasePosition < phaseCycle * 0.5 ? 'amber' : 'red';
-  const queueBias = node.type === 'signalized' ? 6 : node.type === 'bottleneck' ? 10 : node.type === 'transit_hub' ? 4 : 0;
+  const queueBias = node.signalClass === 'signalized' ? 6 : node.signalClass === 'bottleneck' ? 10 : node.signalClass === 'transit' ? 4 : 0;
   const qN = round0(clamp(18 + wave(seed, 1.3) * 8 + queueBias, 0, 160));
-  const qS = round0(clamp(16 + wave(seed + 1, 1.7) * 7 + (node.type === 'transit_hub' ? 4 : queueBias / 2), 0, 160));
-  const qE = round0(clamp(14 + wave(seed + 2, 1.9) * 6 + (node.type === 'signalized' ? 3 : 0), 0, 160));
-  const qW = round0(clamp(13 + wave(seed + 3, 1.1) * 6 + (node.type === 'signalized' ? 3 : 0), 0, 160));
+  const qS = round0(clamp(16 + wave(seed + 1, 1.7) * 7 + (node.signalClass === 'transit' ? 4 : queueBias / 2), 0, 160));
+  const qE = round0(clamp(14 + wave(seed + 2, 1.9) * 6 + (node.signalClass === 'signalized' ? 3 : 0), 0, 160));
+  const qW = round0(clamp(13 + wave(seed + 3, 1.1) * 6 + (node.signalClass === 'signalized' ? 3 : 0), 0, 160));
 
   return {
     id: node.id,
@@ -48,20 +48,21 @@ export const buildNodeState = (node: NodeDefinition, tick: number): NodeState =>
     q_s: qS,
     q_e: qE,
     q_w: qW,
-    throughput: round0(clamp(320 + wave(seed, 1.2) * 120 + (node.type === 'rotary' ? 50 : 0) + (node.type === 'signalized' ? 35 : 0), 100, 900)),
+    throughput: round0(clamp(320 + wave(seed, 1.2) * 120 + (node.signalClass === 'signalized' ? 35 : 0), 100, 900)),
   };
 };
 
-export const buildLinkState = (link: LinkDefinition, nodes: Record<string, NodeDefinition>, tick: number, loadFactor = 0) => {
+export const buildLinkState = (link: RoadLink, nodes: Record<string, JunctionNode>, tick: number, loadFactor = 0) => {
   const from = nodes[link.from];
   const to = nodes[link.to];
   const seed = (hash(link.id) + tick * 17) / 100;
-  const roadBias = link.weight === 5 ? -4 : link.weight === 3 ? 2 : 8;
+  const weight = link.roadClass === 'bypass' ? 5 : link.roadClass === 'arterial' ? 4 : link.roadClass === 'collector' ? 3 : 3;
+  const roadBias = weight === 5 ? -4 : weight === 3 ? 2 : 8;
   const geometryBias = Math.abs(from.lat - to.lat) * 420 + Math.abs(from.lng - to.lng) * 550;
   const speed = clamp(42 + wave(seed, 1.5) * 11 - roadBias - loadFactor * 18 - geometryBias, 5, 56);
-  const volume = round0(clamp((link.weight === 5 ? 820 : link.weight === 3 ? 560 : 320) + wave(seed + 1, 1.1) * 110 + loadFactor * 180, 80, 1600));
+  const volume = round0(clamp((weight === 5 ? 820 : weight === 3 ? 560 : 320) + wave(seed + 1, 1.1) * 110 + loadFactor * 180, 80, 1600));
   const queue = round0(clamp(geometryBias * 1.2 + loadFactor * 120 + (50 - speed) * 4, 0, 480));
-  const freeFlow = link.weight === 5 ? 38 : link.weight === 3 ? 44 : 50;
+  const freeFlow = weight === 5 ? 38 : weight === 3 ? 44 : 50;
   const delay = round0(clamp(((freeFlow - speed) / freeFlow) * 100 + loadFactor * 85, 0, 260));
   const travelSeconds = round0(clamp(((Math.abs(from.lat - to.lat) + Math.abs(from.lng - to.lng)) * 111000) / Math.max(speed, 5) * 3.6, 25, 420));
   const occupancy = clamp(0.18 + (60 - speed) / 68 + loadFactor * 0.4, 0.05, 0.98);
@@ -84,7 +85,7 @@ export const buildLinkState = (link: LinkDefinition, nodes: Record<string, NodeD
   } satisfies LinkState;
 };
 
-export const buildLinkPath = (link: LinkDefinition, nodes: Record<string, NodeDefinition>) => {
+export const buildLinkPath = (link: RoadLink, nodes: Record<string, JunctionNode>) => {
   const from = nodes[link.from];
   const to = nodes[link.to];
   const normalize = (pt: [number, number]) => {

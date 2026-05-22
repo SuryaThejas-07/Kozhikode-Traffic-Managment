@@ -24,7 +24,7 @@ export function KUTISShell() {
       <TopNav />
       <div className="relative flex-1 overflow-hidden">
         <KUTISMap hidden={hiddenMap} />
-        <div className="absolute inset-0 z-20 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 z-20 overflow-auto pointer-events-auto">
           <Outlet />
         </div>
       </div>

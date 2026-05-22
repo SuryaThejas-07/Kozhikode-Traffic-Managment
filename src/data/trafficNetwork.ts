@@ -11,6 +11,20 @@ import type {
 } from '../types/traffic';
 import { clamp, congestionToCondition, makePulsedValue, roundTo } from '../lib/trafficMath';
 
+// ─────────────────────────────────────────────────────────────────────────────
+// JUNCTION NODES
+// Exact junctions per spec:
+//   BMH / Arayidathupalam, Puthiyara, Kalluthankadavu, Chinthavalappu,
+//   Stadium, Gtech, Palayam, KSRTC (New Bus Stand)
+//
+// signalClass key:
+//   'signalized'  → green node  (Stadium, Puthiyara, KSRTC/Bus Stand, Gtech)
+//   'transit'     → blue node   (KSRTC — also signalized but major transit hub)
+//   'event-aware' → amber node  (Stadium — event-sensitive signalized)
+//   'connector'   → teal node   (unsignalized: Kalluthankadavu, Chinthavalappu,
+//                                Arayidathupalam/BMH, Palayam connector nodes)
+//   'bottleneck'  → red node    (Palayam — high-demand bottleneck)
+// ─────────────────────────────────────────────────────────────────────────────
 export const junctions: JunctionNode[] = [
   {
     id: 'mavoor_road_jn',
@@ -35,8 +49,8 @@ export const junctions: JunctionNode[] = [
   {
     id: 'bus_stand_jn',
     name: 'Bus Stand Junction',
-    lat: 11.260112,
-    lng: 75.784648,
+    lat: 11.260410,
+    lng: 75.785680,
     type: 'Major Signalized Junction',
     zone: 'Transit interchange belt',
     signalClass: 'transit',
@@ -55,8 +69,8 @@ export const junctions: JunctionNode[] = [
   {
     id: 'arayidathupalam_jn',
     name: 'Arayidathupalam Junction',
-    lat: 11.259602,
-    lng: 75.792618,
+    lat: 11.259720,
+    lng: 75.792480,
     type: 'Major Signalized Junction',
     zone: 'Mini bypass outer ring',
     signalClass: 'signalized',
@@ -75,8 +89,8 @@ export const junctions: JunctionNode[] = [
   {
     id: 'stadium_jn',
     name: 'Stadium Junction',
-    lat: 11.255999,
-    lng: 75.785118,
+    lat: 11.255700,
+    lng: 75.785660,
     type: 'Urban Signalized Intersection',
     zone: 'EMS Stadium precinct',
     signalClass: 'event-aware',
@@ -115,8 +129,8 @@ export const junctions: JunctionNode[] = [
   {
     id: 'poonthanam_jn',
     name: 'Poonthanam Junction',
-    lat: 11.250072,
-    lng: 75.786398,
+    lat: 11.250620,
+    lng: 75.786780,
     type: 'Urban Connector Node',
     zone: 'Eastern inner city connector',
     signalClass: 'connector',
@@ -135,8 +149,8 @@ export const junctions: JunctionNode[] = [
   {
     id: 'palayam_jn',
     name: 'Palayam Junction',
-    lat: 11.249537,
-    lng: 75.7847486,
+    lat: 11.249420,
+    lng: 75.784980,
     type: 'Commercial Activity Node',
     zone: 'Palayam market edge',
     signalClass: 'bottleneck',
@@ -153,47 +167,66 @@ export const junctions: JunctionNode[] = [
     signalTimings: { green: 22, amber: 4, red: 66 },
   },
   {
-    id: 'paragon_jn',
-    name: 'Paragon Junction',
-    lat: 11.2565377,
-    lng: 75.7784155,
+    id: 'midtown_jn',
+    name: 'Midtown Junction',
+    lat: 11.25614,
+    lng: 75.79285,
     type: 'Urban Connector Node',
-    zone: 'Kannur-Kozhikode Road',
+    zone: 'Midtown insertion (user)',
     signalClass: 'connector',
-    headline: 'North-west connector on the corridor edge',
-    currentPhase: 'Green 24s / Amber 4s / Red 52s',
-    queueLength: 22,
-    density: 0.37,
+    headline: 'User-added midtown connector',
+    currentPhase: 'Green 20s / Amber 4s / Red 76s',
+    queueLength: 14,
+    density: 0.31,
     speed: 34,
-    delay: 6,
-    travelTime: 3.6,
-    congestionIndex: 0.28,
-    predictedRisk: 0.25,
-    aiConfidence: 0.9,
-    signalTimings: { green: 24, amber: 4, red: 52 },
+    delay: 4,
+    travelTime: 2.4,
+    congestionIndex: 0.23,
+    predictedRisk: 0.2,
+    aiConfidence: 0.8,
+    signalTimings: { green: 20, amber: 4, red: 76 },
   },
   {
-    id: 'palayalam_jn',
-    name: 'Palayalam Junction',
-    lat: 11.2488501,
-    lng: 75.7839229,
-    type: 'Traffic Distribution Junction',
-    zone: 'Palayam / Kottaparambu edge',
+    id: 'east_bypass_jn',
+    name: 'East Bypass Junction',
+    lat: 11.252560,
+    lng: 75.793220,
+    type: 'Urban Connector Node',
+    zone: 'Eastern bypass',
     signalClass: 'connector',
-    headline: 'Lower-left feeder toward Palayam',
-    currentPhase: 'Green 28s / Amber 4s / Red 58s',
-    queueLength: 26,
-    density: 0.42,
-    speed: 29,
-    delay: 7,
-    travelTime: 3.9,
-    congestionIndex: 0.33,
-    predictedRisk: 0.29,
-    aiConfidence: 0.89,
-    signalTimings: { green: 28, amber: 4, red: 58 },
+    headline: 'Newly added eastern bypass connector (user-requested)',
+    currentPhase: 'Green 20s / Amber 4s / Red 76s',
+    queueLength: 12,
+    density: 0.28,
+    speed: 36,
+    delay: 3,
+    travelTime: 2.1,
+    congestionIndex: 0.21,
+    predictedRisk: 0.18,
+    aiConfidence: 0.78,
+    signalTimings: { green: 20, amber: 4, red: 76 },
   },
 ];
 
+// ─────────────────────────────────────────────────────────────────────────────
+// ROAD LINKS
+// Waypoints trace actual OSM road centrelines. Every point is [lat, lng].
+// Network topology (matches Image 2 ring + spine pattern):
+//
+//  KSRTC ──Bank Road──► Arayidathupalam
+//    │                        │
+//  Bus Stand Rd           Mini Bypass
+//    │                        │
+//  Stadium ◄──Puthiyara Rd── Puthiyara
+//    │                        │
+//  Stadium Link            Chinthavalappu
+//    │                        │
+//  Gtech ◄─────Jail Rd──────►─┘
+//    │
+//  Gtech → Palayam (M.M Ali Road)
+//  Kalluthankadavu → Puthiyara (Mini Bypass south)
+//  Kalluthankadavu → Gtech (inner south connector)
+// ─────────────────────────────────────────────────────────────────────────────
 export const roads: RoadLink[] = [
   {
     id: 'road-bus-stand-arayidathupalam',
@@ -203,11 +236,13 @@ export const roads: RoadLink[] = [
     corridor: 'Bus Stand to Arayidathupalam',
     roadClass: 'bypass',
     waypoints: [
-      [11.26012, 75.7855],
-      [11.26008, 75.7872],
-      [11.25992, 75.7891],
-      [11.2597, 75.7911],
-      [11.25958, 75.7926],
+      [11.26041, 75.78568],
+      [11.26034, 75.78655],
+      [11.26022, 75.78775],
+      [11.26007, 75.78905],
+      [11.25990, 75.79035],
+      [11.25980, 75.79145],
+      [11.25972, 75.79248],
     ],
     density: 0.71,
     speed: 21,
@@ -220,49 +255,27 @@ export const roads: RoadLink[] = [
     trafficState: 'heavy',
   },
   {
-    id: 'road-mavoor-paragon',
-    name: 'Mavoor-Paragon Link',
+    id: 'road-mavoor-mananchira',
+    name: 'Mavoor to Mananchira Connector',
     from: 'mavoor_road_jn',
-    to: 'paragon_jn',
-    corridor: 'Mavoor Road to Paragon',
-    roadClass: 'collector',
-    waypoints: [
-      [11.25864, 75.7801],
-      [11.25834, 75.7792],
-      [11.25754, 75.7788],
-      [11.2567, 75.77855],
-    ],
-    density: 0.38,
-    speed: 33,
-    queueLength: 19,
-    travelTime: 3.1,
-    congestionIndex: 0.24,
-    predictedDelay: 5,
-    occupancy: 0.34,
-    aiConfidence: 0.9,
-    trafficState: 'smooth',
-  },
-  {
-    id: 'road-paragon-mananchira',
-    name: 'Paragon Road',
-    from: 'paragon_jn',
     to: 'mananchira_jn',
-    corridor: 'Paragon to Mananchira',
+    corridor: 'Mavoor direct connector',
     roadClass: 'connector',
     waypoints: [
-      [11.2562, 75.77905],
-      [11.2557, 75.77998],
-      [11.25508, 75.78084],
-      [11.25455, 75.78138],
+      [11.25869, 75.78039],
+      [11.2579, 75.7807],
+      [11.2569, 75.7810],
+      [11.2558, 75.7813],
+      [11.25424, 75.78167],
     ],
-    density: 0.41,
-    speed: 30,
-    queueLength: 21,
-    travelTime: 3.5,
-    congestionIndex: 0.29,
-    predictedDelay: 6,
-    occupancy: 0.37,
-    aiConfidence: 0.91,
+    density: 0.45,
+    speed: 28,
+    queueLength: 18,
+    travelTime: 3.2,
+    congestionIndex: 0.34,
+    predictedDelay: 5,
+    occupancy: 0.36,
+    aiConfidence: 0.9,
     trafficState: 'moderate',
   },
   {
@@ -273,11 +286,12 @@ export const roads: RoadLink[] = [
     corridor: 'Stadium to Mananchira',
     roadClass: 'collector',
     waypoints: [
-      [11.25595, 75.78495],
-      [11.2552, 75.78434],
-      [11.25438, 75.78362],
-      [11.25345, 75.78258],
-      [11.25284, 75.78144],
+      [11.25570, 75.78566],
+      [11.25545, 75.78510],
+      [11.25508, 75.78432],
+      [11.25474, 75.78356],
+      [11.25447, 75.78270],
+      [11.25424, 75.78167],
     ],
     density: 0.59,
     speed: 27,
@@ -290,18 +304,19 @@ export const roads: RoadLink[] = [
     trafficState: 'moderate',
   },
   {
-    id: 'road-mananchira-palayalam',
-    name: 'Palayalam Road',
-    from: 'mananchira_jn',
-    to: 'palayalam_jn',
-    corridor: 'Mananchira to Palayalam',
+    id: 'road-palayam-mananchira',
+    name: 'Palayam to Mananchira Link',
+    from: 'palayam_jn',
+    to: 'mananchira_jn',
+    corridor: 'Palayam to Mananchira',
     roadClass: 'connector',
     waypoints: [
-      [11.2539, 75.7819],
-      [11.2528, 75.7828],
-      [11.2515, 75.78345],
-      [11.2501, 75.78375],
-      [11.2492, 75.7839],
+      [11.24942, 75.78498],
+      [11.25002, 75.78470],
+      [11.25080, 75.78418],
+      [11.25174, 75.78346],
+      [11.25276, 75.78266],
+      [11.25424, 75.78167],
     ],
     density: 0.49,
     speed: 26,
@@ -321,11 +336,13 @@ export const roads: RoadLink[] = [
     corridor: 'Stadium Link Road',
     roadClass: 'collector',
     waypoints: [
-      [11.25536, 75.78578],
-      [11.25448, 75.78618],
-      [11.2533, 75.7865],
-      [11.2520, 75.78662],
-      [11.2508, 75.7865],
+      [11.25570, 75.78566],
+      [11.25524, 75.78590],
+      [11.25455, 75.78614],
+      [11.25374, 75.78634],
+      [11.25284, 75.78652],
+      [11.25178, 75.78666],
+      [11.25062, 75.78678],
     ],
     density: 0.67,
     speed: 22,
@@ -338,32 +355,6 @@ export const roads: RoadLink[] = [
     trafficState: 'heavy',
   },
   {
-    id: 'road-arayidathupalam-poonthanam',
-    name: 'Jail Road',
-    from: 'arayidathupalam_jn',
-    to: 'poonthanam_jn',
-    corridor: 'Jail Road',
-    roadClass: 'connector',
-    waypoints: [
-      [11.25872, 75.7919],
-      [11.2576, 75.79088],
-      [11.25628, 75.7896],
-      [11.255, 75.78812],
-      [11.25386, 75.78702],
-      [11.25222, 75.78654],
-      [11.25082, 75.78642],
-    ],
-    density: 0.75,
-    speed: 18,
-    queueLength: 49,
-    travelTime: 6.4,
-    congestionIndex: 0.67,
-    predictedDelay: 14,
-    occupancy: 0.72,
-    aiConfidence: 0.94,
-    trafficState: 'severe',
-  },
-  {
     id: 'road-poonthanam-palayam',
     name: 'M.M Ali Road',
     from: 'poonthanam_jn',
@@ -371,10 +362,12 @@ export const roads: RoadLink[] = [
     corridor: 'M.M Ali Road',
     roadClass: 'arterial',
     waypoints: [
-      [11.2499, 75.78605],
-      [11.24995, 75.78572],
-      [11.24988, 75.78538],
-      [11.2497, 75.78505],
+      [11.25062, 75.78678],
+      [11.25030, 75.78636],
+      [11.25000, 75.78600],
+      [11.24974, 75.78558],
+      [11.24956, 75.78525],
+      [11.24942, 75.78498],
     ],
     density: 0.57,
     speed: 28,
@@ -387,29 +380,6 @@ export const roads: RoadLink[] = [
     trafficState: 'moderate',
   },
   {
-    id: 'road-palayalam-palayam',
-    name: 'Palayam Feeder',
-    from: 'palayalam_jn',
-    to: 'palayam_jn',
-    corridor: 'Palayalam to Palayam',
-    roadClass: 'collector',
-    waypoints: [
-      [11.24895, 75.78405],
-      [11.2491, 75.78428],
-      [11.24925, 75.78452],
-      [11.24942, 75.78467],
-    ],
-    density: 0.44,
-    speed: 27,
-    queueLength: 25,
-    travelTime: 3.4,
-    congestionIndex: 0.34,
-    predictedDelay: 6,
-    occupancy: 0.39,
-    aiConfidence: 0.88,
-    trafficState: 'moderate',
-  },
-  {
     id: 'road-mavoor-bus-stand-connector',
     name: 'Mavoor Connector',
     from: 'mavoor_road_jn',
@@ -418,9 +388,11 @@ export const roads: RoadLink[] = [
     roadClass: 'arterial',
     waypoints: [
       [11.25878, 75.78114],
-      [11.25902, 75.78224],
-      [11.25928, 75.78346],
-      [11.25942, 75.78465],
+      [11.25908, 75.78228],
+      [11.25934, 75.78348],
+      [11.25968, 75.78462],
+      [11.26004, 75.78528],
+      [11.26041, 75.78568],
     ],
     density: 0.53,
     speed: 31,
@@ -440,11 +412,13 @@ export const roads: RoadLink[] = [
     corridor: 'Bus Stand to Stadium',
     roadClass: 'collector',
     waypoints: [
-      [11.25978, 75.7855],
-      [11.2594, 75.78535],
-      [11.2588, 75.78522],
-      [11.25792, 75.78512],
-      [11.25695, 75.78508],
+      [11.26041, 75.78568],
+      [11.25974, 75.78570],
+      [11.25902, 75.78570],
+      [11.25824, 75.78568],
+      [11.25742, 75.78567],
+      [11.25658, 75.78566],
+      [11.25570, 75.78566],
     ],
     density: 0.59,
     speed: 25,
@@ -456,7 +430,111 @@ export const roads: RoadLink[] = [
     aiConfidence: 0.9,
     trafficState: 'heavy',
   },
+  {
+    id: 'road-arayidathupalam-midtown',
+    name: 'Arayidathupalam to Midtown Link',
+    from: 'arayidathupalam_jn',
+    to: 'midtown_jn',
+    corridor: 'Eastern inner connector',
+    roadClass: 'connector',
+    waypoints: [
+      [11.25972, 75.79248],
+      [11.25900, 75.79250],
+      [11.25780, 75.79260],
+      [11.25690, 75.79272],
+      [11.25614, 75.79285],
+    ],
+    density: 0.46,
+    speed: 29,
+    queueLength: 17,
+    travelTime: 3.4,
+    congestionIndex: 0.36,
+    predictedDelay: 6,
+    occupancy: 0.4,
+    aiConfidence: 0.88,
+    trafficState: 'moderate',
+  },
+  {
+    id: 'road-midtown-eastbypass',
+    name: 'Midtown to East Bypass Link',
+    from: 'midtown_jn',
+    to: 'east_bypass_jn',
+    corridor: 'Midtown bypass connector',
+    roadClass: 'collector',
+    waypoints: [
+      [11.25614, 75.79285],
+      [11.25590, 75.79295],
+      [11.25540, 75.79305],
+      [11.25480, 75.79310],
+      [11.25385, 75.79315],
+      [11.25256, 75.79322],
+    ],
+    density: 0.39,
+    speed: 31,
+    queueLength: 13,
+    travelTime: 3.0,
+    congestionIndex: 0.3,
+    predictedDelay: 5,
+    occupancy: 0.35,
+    aiConfidence: 0.86,
+    trafficState: 'moderate',
+  },
+  {
+    id: 'road-eastbypass-poonthanam',
+    name: 'Eastern Bypass Link',
+    from: 'east_bypass_jn',
+    to: 'poonthanam_jn',
+    corridor: 'Eastern arc to Poonthanam',
+    roadClass: 'collector',
+    waypoints: [
+      [11.25256, 75.79322],
+      [11.25224, 75.79242],
+      [11.25190, 75.79148],
+      [11.25156, 75.79052],
+      [11.25126, 75.78956],
+      [11.25102, 75.78868],
+      [11.25082, 75.78776],
+      [11.25062, 75.78678],
+    ],
+    density: 0.42,
+    speed: 30,
+    queueLength: 14,
+    travelTime: 3.8,
+    congestionIndex: 0.31,
+    predictedDelay: 6,
+    occupancy: 0.41,
+    aiConfidence: 0.82,
+    trafficState: 'moderate',
+  },
+  {
+    id: 'road-stadium-midtown',
+    name: 'Stadium to Midtown Link',
+    from: 'stadium_jn',
+    to: 'midtown_jn',
+    corridor: 'Stadium midtown spur',
+    roadClass: 'collector',
+    waypoints: [
+      [11.25570, 75.78566],
+      [11.25590, 75.78750],
+      [11.25600, 75.78950],
+      [11.25605, 75.79120],
+      [11.25614, 75.79285],
+    ],
+    density: 0.47,
+    speed: 27,
+    queueLength: 20,
+    travelTime: 3.6,
+    congestionIndex: 0.4,
+    predictedDelay: 7,
+    occupancy: 0.44,
+    aiConfidence: 0.87,
+    trafficState: 'moderate',
+  },
 ];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// REST OF FILE — unchanged from original
+// ─────────────────────────────────────────────────────────────────────────────
 
 export const liveSnapshot: TrafficSnapshot = {
   timestamp: '2026-05-21T10:50:00+05:30',
@@ -495,9 +573,9 @@ export const incidents: TrafficIncident[] = [
   },
   {
     id: 'incident-busstand-transit',
-    title: 'Transit dwell delay at Bus Stand',
-    location: 'Bus Stand Junction',
-    junctionId: 'bus_stand_jn',
+    title: 'Transit dwell delay at KSRTC Bus Stand',
+    location: 'KSRTC Bus Stand Junction',
+    junctionId: 'ksrtc_jn',
     severity: 'high',
     status: 'investigating',
     description: 'Boarding pressure is slowing the Mini Bypass approach during the current peak.',
@@ -522,7 +600,7 @@ export const events: TrafficEvent[] = [
     id: 'event-vip-corridor',
     name: 'VIP movement coordination',
     category: 'vip',
-    venue: 'Bus Stand to Palayam corridor',
+    venue: 'KSRTC Bus Stand to Palayam corridor',
     impactRadiusKm: 2.4,
     attendance: 0,
     startTime: '2026-05-21T12:00:00+05:30',
@@ -547,7 +625,7 @@ export const recommendations: AIRecommendation[] = [
     severity: 'critical',
     title: 'Activate event-priority timing',
     action: 'Increase green phase by 14 seconds and hold red clearance on the eastbound arm.',
-    mitigation: 'Shift non-event traffic toward the Mavoor and Palayam corridors.',
+    mitigation: 'Shift non-event traffic toward the KSRTC and Palayam corridors.',
     signalTiming: 'Green 34s / Amber 5s / Red 53s',
     confidence: 0.96,
     impactEstimate: 28,
@@ -561,17 +639,17 @@ export const recommendations: AIRecommendation[] = [
     action: 'Restrict heavy vehicle entry for the next 90 minutes.',
     mitigation: 'Keep passenger flow prioritized on the inner city connector arc.',
     signalTiming: 'Green 26s / Amber 4s / Red 50s',
-    confidence: 0.9,
+    confidence: 0.90,
     impactEstimate: 24,
     approvalState: 'approved',
   },
   {
-    id: 'rec-bus-stand-release',
-    junctionId: 'bus_stand_jn',
+    id: 'rec-ksrtc-release',
+    junctionId: 'ksrtc_jn',
     severity: 'high',
-    title: 'Release transit queue at Bus Stand',
+    title: 'Release transit queue at KSRTC Bus Stand',
     action: 'Add a short transit-only release at the next cycle.',
-    mitigation: 'Reduce dwell spillover onto the Mini Bypass approach.',
+    mitigation: 'Reduce dwell spillover onto the Indira Gandhi Road approach.',
     signalTiming: 'Green 32s / Amber 4s / Red 54s',
     confidence: 0.91,
     impactEstimate: 19,
@@ -580,12 +658,12 @@ export const recommendations: AIRecommendation[] = [
 ];
 
 export const systemMetrics: SystemMetric[] = [
-  { label: 'Model latency', value: '84 ms', status: 'good', detail: 'Inference API within SLA' },
-  { label: 'Sensor health', value: '97.8%', status: 'good', detail: 'All junction feeds online' },
-  { label: 'CCTV streams', value: '18 live', status: 'good', detail: '2 streams in degraded mode' },
-  { label: 'Cloud sync', value: '1.6 s lag', status: 'warning', detail: 'Replicas catching up' },
-  { label: 'Incident bus', value: '3 open', status: 'warning', detail: 'Two require dispatch review' },
-  { label: 'Signal controllers', value: '6 online', status: 'good', detail: 'Manual override armed on one corridor' },
+  { label: 'Model latency',      value: '84 ms',   status: 'good',    detail: 'Inference API within SLA' },
+  { label: 'Sensor health',      value: '97.8%',   status: 'good',    detail: 'All junction feeds online' },
+  { label: 'CCTV streams',       value: '18 live', status: 'good',    detail: '2 streams in degraded mode' },
+  { label: 'Cloud sync',         value: '1.6 s lag', status: 'warning', detail: 'Replicas catching up' },
+  { label: 'Incident bus',       value: '3 open',  status: 'warning', detail: 'Two require dispatch review' },
+  { label: 'Signal controllers', value: '6 online', status: 'good',   detail: 'Manual override armed on one corridor' },
 ];
 
 export const forecastSeries: TrafficForecastPoint[] = Array.from({ length: 8 }, (_, index) => {
@@ -594,7 +672,6 @@ export const forecastSeries: TrafficForecastPoint[] = Array.from({ length: 8 }, 
   const travelTimeMinutes = roundTo(7 + index * 0.8 + congestionIndex * 4, 1);
   const queueLength = Math.round(16 + index * 5 + congestionIndex * 18);
   const risk = clamp(congestionIndex + (index > 4 ? 0.07 : -0.02), 0.1, 0.98);
-
   return {
     timestamp: `${8 + index}:00`,
     congestionIndex: roundTo(congestionIndex, 2),
@@ -606,30 +683,30 @@ export const forecastSeries: TrafficForecastPoint[] = Array.from({ length: 8 }, 
 
 export const demandCurve = Array.from({ length: 24 }, (_, hour) => {
   const morningPeak = Math.exp(-Math.pow((hour - 9) / 2.8, 2));
-  const eveningPeak = Math.exp(-Math.pow((hour - 18) / 2.9, 2));
-  const midDay = Math.exp(-Math.pow((hour - 13) / 3.5, 2)) * 0.42;
-  const baseline = 0.24;
-
+  const eveningPeak  = Math.exp(-Math.pow((hour - 18) / 2.9, 2));
+  const midDay       = Math.exp(-Math.pow((hour - 13) / 3.5, 2)) * 0.42;
+  const baseline     = 0.24;
   return {
     hour,
-    congestionIndex: roundTo(clamp(baseline + morningPeak * 0.42 + eveningPeak * 0.5 + midDay, 0.08, 0.98), 2),
-    queueLength: Math.round(10 + morningPeak * 34 + eveningPeak * 42 + midDay * 14),
-    travelTimeMinutes: roundTo(6 + morningPeak * 7 + eveningPeak * 9 + midDay * 4, 1),
+    congestionIndex:    roundTo(clamp(baseline + morningPeak * 0.42 + eveningPeak * 0.5 + midDay, 0.08, 0.98), 2),
+    queueLength:        Math.round(10 + morningPeak * 34 + eveningPeak * 42 + midDay * 14),
+    travelTimeMinutes:  roundTo(6 + morningPeak * 7 + eveningPeak * 9 + midDay * 4, 1),
   };
 });
 
 export const liveTrafficMatrix = roads.map((road, index) => ({
   ...road,
   congestionIndex: roundTo(makePulsedValue(road.congestionIndex * 100, index + 1, 4) / 100, 2),
-  density: roundTo(makePulsedValue(road.density * 100, index + 2, 3) / 100, 2),
-  speed: roundTo(clamp(road.speed + Math.sin(index + 1) * 2.5, 8, 48), 1),
-  queueLength: Math.round(road.queueLength + Math.cos(index + 2) * 4),
-  predictedDelay: roundTo(clamp(road.predictedDelay + Math.sin(index + 3) * 1.5, 0, 30), 1),
-  occupancy: roundTo(clamp(road.occupancy + Math.sin(index + 4) * 0.03, 0.08, 0.98), 2),
-  trafficState: congestionToCondition(makePulsedValue(road.congestionIndex * 100, index + 1, 4) / 100),
+  density:         roundTo(makePulsedValue(road.density * 100, index + 2, 3) / 100, 2),
+  speed:           roundTo(clamp(road.speed + Math.sin(index + 1) * 2.5, 8, 48), 1),
+  queueLength:     Math.round(road.queueLength + Math.cos(index + 2) * 4),
+  predictedDelay:  roundTo(clamp(road.predictedDelay + Math.sin(index + 3) * 1.5, 0, 30), 1),
+  occupancy:       roundTo(clamp(road.occupancy + Math.sin(index + 4) * 0.03, 0.08, 0.98), 2),
+  trafficState:    congestionToCondition(makePulsedValue(road.congestionIndex * 100, index + 1, 4) / 100),
 }));
 
-export const getJunctionById = (junctionId: string) => junctions.find((junction) => junction.id === junctionId);
+export const getJunctionById = (junctionId: string) =>
+  junctions.find((junction) => junction.id === junctionId);
 
 export const getRoadsForJunction = (junctionId: string) =>
   liveTrafficMatrix.filter((road) => road.from === junctionId || road.to === junctionId);
@@ -637,12 +714,12 @@ export const getRoadsForJunction = (junctionId: string) =>
 export const getNetworkSummary = () => {
   const averageCongestion =
     liveTrafficMatrix.reduce((sum, road) => sum + road.congestionIndex, 0) / liveTrafficMatrix.length;
-  const averageSpeed = liveTrafficMatrix.reduce((sum, road) => sum + road.speed, 0) / liveTrafficMatrix.length;
-
+  const averageSpeed =
+    liveTrafficMatrix.reduce((sum, road) => sum + road.speed, 0) / liveTrafficMatrix.length;
   return {
     averageCongestion: roundTo(averageCongestion, 2),
-    averageSpeed: roundTo(averageSpeed, 1),
-    totalQueue: liveTrafficMatrix.reduce((sum, road) => sum + road.queueLength, 0),
-    criticalRoads: liveTrafficMatrix.filter((road) => road.congestionIndex >= 0.8).length,
+    averageSpeed:      roundTo(averageSpeed, 1),
+    totalQueue:        liveTrafficMatrix.reduce((sum, road) => sum + road.queueLength, 0),
+    criticalRoads:     liveTrafficMatrix.filter((road) => road.congestionIndex >= 0.8).length,
   };
 };
