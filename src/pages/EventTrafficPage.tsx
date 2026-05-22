@@ -3,7 +3,7 @@ import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAx
 import { TrafficMap } from '../components/map/TrafficMap';
 import { MetricCard } from '../components/ui/MetricCard';
 import { Panel } from '../components/ui/Panel';
-import { events } from '../data/trafficNetwork';
+import { events, junctions } from '../data/trafficNetwork';
 import { mockApi } from '../data/mockApi';
 import { useEventStore } from '../store/event.store';
 import { selectEvent } from '../lib/trafficSelectors';
@@ -41,12 +41,27 @@ export function EventTrafficPage() {
   }>({ id: '', name: '', category: 'sports', venue: '', impactRadiusKm: 1.0, attendance: 0, startTime: '', endTime: '', state: 'scheduled' });
 
   const onAdd = () => {
+    setError(null);
+    // required
     if (!form.id || !form.name) return setError('Provide id and name');
     if (eventList.some((e) => e.id === form.id)) return setError('An event with this id already exists');
+    // datetime validation
+    const startMs = form.startTime ? Date.parse(form.startTime) : NaN;
+    const endMs = form.endTime ? Date.parse(form.endTime) : NaN;
+    if (isNaN(startMs) || isNaN(endMs)) return setError('Start and end must be valid date/time');
+    if (endMs < startMs) return setError('End time must be the same or after start time');
+    // attendance bounds
+    if (form.attendance < 0 || form.attendance > 1000000) return setError('Attendance must be between 0 and 1,000,000');
+
     // hydrate duplicate-safe
     addEvent({ ...form });
     setShowAdd(false);
     setForm({ id: '', name: '', category: 'sports', venue: '', impactRadiusKm: 1.0, attendance: 0, startTime: '', endTime: '', state: 'scheduled' });
+  };
+  
+  const openAdd = () => {
+    setError(null);
+    setShowAdd(true);
   };
   const [error, setError] = useState<string | null>(null);
   const crowdSeries = [
@@ -70,7 +85,7 @@ export function EventTrafficPage() {
       </section>
 
       <section className="grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
-          <Panel title="Event traffic management" eyebrow="Special event operations">
+          <Panel title="Event traffic management" eyebrow="Special event operations" className="pointer-events-auto">
             <div className="flex items-center justify-between">
               <div className="text-sm text-[var(--muted)]">Interactive event map and operational controls.</div>
               <div className="space-x-2">
@@ -83,7 +98,7 @@ export function EventTrafficPage() {
           </Panel>
 
         <div className="space-y-5">
-          <Panel title="Event scenarios" eyebrow="Simulation control">
+          <Panel title="Event scenarios" eyebrow="Simulation control" className="pointer-events-auto">
             <div className="space-y-3">
               {eventList.map((event) => (
                 <button
@@ -116,22 +131,56 @@ export function EventTrafficPage() {
                 <div className="rounded-lg border bg-white p-4 shadow-lg">
                   <h3 className="text-lg font-semibold">Add Event</h3>
                   <div className="mt-3 grid gap-2">
-                    <input placeholder="id (unique)" value={form.id} onChange={(e) => setForm({ ...form, id: e.target.value })} className="border p-2" />
-                    <input placeholder="name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="border p-2" />
-                    <input placeholder="venue" value={form.venue} onChange={(e) => setForm({ ...form, venue: e.target.value })} className="border p-2" />
+                    <label className="text-sm text-[var(--muted)]">ID (unique)</label>
+                    <input placeholder="eg. event-2026-parade" value={form.id} onChange={(e) => setForm({ ...form, id: e.target.value.trim() })} className="border p-2" />
+
+                    <label className="text-sm text-[var(--muted)]">Name</label>
+                    <input placeholder="Event name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="border p-2" />
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-sm text-[var(--muted)]">Category</label>
+                        <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value as any })} className="border p-2 w-full">
+                          <option value="sports">sports</option>
+                          <option value="vip">vip</option>
+                          <option value="rally">rally</option>
+                          <option value="festival">festival</option>
+                          <option value="religious">religious</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="text-sm text-[var(--muted)]">Venue (pick from junctions)</label>
+                        <select value={form.venue} onChange={(e) => setForm({ ...form, venue: e.target.value })} className="border p-2 w-full">
+                          <option value="">-- choose junction --</option>
+                          {junctions.map((j) => (
+                            <option key={j.id} value={j.name}>{j.name} — {j.zone}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
                     <div className="flex gap-2">
-                      <input type="datetime-local" value={form.startTime} onChange={(e) => setForm({ ...form, startTime: e.target.value })} className="border p-2 flex-1" />
-                      <input type="datetime-local" value={form.endTime} onChange={(e) => setForm({ ...form, endTime: e.target.value })} className="border p-2 flex-1" />
+                      <div className="flex-1">
+                        <label className="text-sm text-[var(--muted)]">Start</label>
+                        <input type="datetime-local" value={form.startTime} onChange={(e) => setForm({ ...form, startTime: e.target.value })} className="border p-2 w-full" />
+                      </div>
+                      <div className="flex-1">
+                        <label className="text-sm text-[var(--muted)]">End</label>
+                        <input type="datetime-local" value={form.endTime} onChange={(e) => setForm({ ...form, endTime: e.target.value })} className="border p-2 w-full" />
+                      </div>
                     </div>
+
                     <div className="flex items-center gap-2">
-                      <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value as any })} className="border p-2">
-                        <option value="sports">sports</option>
-                        <option value="vip">vip</option>
-                        <option value="rally">rally</option>
-                        <option value="festival">festival</option>
+                      <input type="number" min={0} max={1000000} placeholder="attendance" value={form.attendance} onChange={(e) => setForm({ ...form, attendance: Number(e.target.value || 0) })} className="border p-2 w-36" />
+                      <input type="number" step="0.1" min={0} max={20} placeholder="impact km" value={form.impactRadiusKm} onChange={(e) => setForm({ ...form, impactRadiusKm: Number(e.target.value || 1) })} className="border p-2 w-36" />
+                      <select value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value as any })} className="border p-2">
+                        <option value="scheduled">scheduled</option>
+                        <option value="live">live</option>
+                        <option value="completed">completed</option>
                       </select>
-                      <input type="number" placeholder="attendance" value={form.attendance} onChange={(e) => setForm({ ...form, attendance: Number(e.target.value) })} className="border p-2 w-36" />
                     </div>
+
                     <div className="flex justify-end gap-2 mt-3">
                       <button type="button" onClick={() => setShowAdd(false)} className="rounded border px-3 py-1">Cancel</button>
                       <button type="button" onClick={onAdd} className="rounded bg-blue-600 px-3 py-1 text-white">Add</button>
@@ -143,7 +192,7 @@ export function EventTrafficPage() {
             </div>
           ) : null}
 
-          <Panel title={selectedEvent?.name ?? 'Event overview'} eyebrow="Operational simulation">
+          <Panel title={selectedEvent?.name ?? 'Event overview'} eyebrow="Operational simulation" className="pointer-events-auto">
             <div className="grid gap-4 md:grid-cols-2">
               <MetricCard label="Crowd movement" value="Forecasted" detail="Arrival wave front mapped to transit release" />
               <MetricCard label="Parking overflow" value="High risk" detail="Temporary overflow zone required" tone="warning" />
@@ -158,7 +207,7 @@ export function EventTrafficPage() {
             </div>
           </Panel>
 
-          <Panel title="Crowd and parking outlook" eyebrow="Simulation outputs">
+          <Panel title="Crowd and parking outlook" eyebrow="Simulation outputs" className="pointer-events-auto">
             <div className="h-[260px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={crowdSeries}>
