@@ -1,19 +1,59 @@
 import { create } from 'zustand';
-import { DEFAULT_EVENTS } from '../data/mock';
-import type { EventPlan } from '../types/traffic';
+import type { TrafficEvent } from '../types/traffic';
+import { events as seedEvents } from '../data/trafficNetwork';
 
-export const useEventStore = create<{
-  events: EventPlan[];
-  selectedDispersal: 0 | 30 | 60;
-  drawerOpen: boolean;
-  setEvents: (events: EventPlan[]) => void;
-  setSelectedDispersal: (value: 0 | 30 | 60) => void;
-  setDrawerOpen: (value: boolean) => void;
-}>((set) => ({
-  events: DEFAULT_EVENTS,
-  selectedDispersal: 30,
-  drawerOpen: false,
-  setEvents: (events) => set({ events }),
-  setSelectedDispersal: (selectedDispersal) => set({ selectedDispersal }),
-  setDrawerOpen: (drawerOpen) => set({ drawerOpen }),
+const STORAGE_KEY = 'kvt_events_v1';
+
+const loadFromStorage = (): TrafficEvent[] => {
+  try {
+    if (typeof window === 'undefined') return seedEvents.slice();
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return seedEvents.slice();
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed;
+    return seedEvents.slice();
+  } catch (_e) {
+    return seedEvents.slice();
+  }
+};
+
+const saveToStorage = (items: TrafficEvent[]) => {
+  try {
+    if (typeof window === 'undefined') return;
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  } catch (_e) {
+    // ignore
+  }
+};
+
+type EventStore = {
+  events: TrafficEvent[];
+  addEvent: (ev: TrafficEvent) => void;
+  setEvents: (items: TrafficEvent[]) => void;
+  replaceIfMissing: (ev: TrafficEvent) => void;
+};
+
+export const useEventStore = create<EventStore>((set, get) => ({
+  events: loadFromStorage(),
+  addEvent: (ev) => {
+    set((s) => {
+      const next = [ev, ...s.events];
+      saveToStorage(next);
+      return { events: next };
+    });
+  },
+  setEvents: (items) => {
+    saveToStorage(items);
+    set({ events: items });
+  },
+  replaceIfMissing: (ev) => {
+    const existing = get().events.find((e) => e.id === ev.id);
+    if (!existing) {
+      const next = [ev, ...get().events];
+      saveToStorage(next);
+      set({ events: next });
+    }
+  },
 }));
+
+export default useEventStore;

@@ -60,18 +60,39 @@ export function Forecasting() {
             </div>
           </div>
 
-          <div className="mt-5 h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={points.map((point) => ({ label: `+${point.horizon}m`, predicted: point.speed, upper: point.ci_upper, lower: point.ci_lower }))}>
-                <CartesianGrid stroke="var(--border)" />
-                <XAxis dataKey="label" />
-                <YAxis />
-                <Tooltip />
-                <Area type="monotone" dataKey="upper" fill="color-mix(in srgb, var(--accent) 15%, transparent)" stroke="transparent" />
-                <Area type="monotone" dataKey="lower" fill="transparent" stroke="transparent" />
-                <Line type="monotone" dataKey="predicted" stroke="var(--accent)" strokeWidth={2} dot={false} />
-              </AreaChart>
-            </ResponsiveContainer>
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={points.map((point) => ({ label: `+${point.horizon}m`, predicted: point.speed, upper: point.ci_upper, lower: point.ci_lower }))}>
+                  <CartesianGrid stroke="var(--border)" />
+                  <XAxis dataKey="label" />
+                  <YAxis />
+                  <Tooltip />
+                  <Area type="monotone" dataKey="upper" fill="color-mix(in srgb, var(--accent) 18%, transparent)" stroke="transparent" />
+                  <Area type="monotone" dataKey="lower" fill="color-mix(in srgb, var(--accent) 6%, transparent)" stroke="transparent" />
+                  <Line type="monotone" dataKey="predicted" stroke="var(--accent)" strokeWidth={2} dot={{ r: 3 }} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <MetricCard label="Avg predicted speed" value={`${Math.round(points.reduce((s, p) => s + p.speed, 0) / points.length)} km/h`} detail={`Horizon +${horizon}m`} tone="default" />
+                <MetricCard label="Forecast crowd" value={forecastCrowd.toLocaleString('en-IN')} detail={eventEnabled ? 'Event simulated' : 'Baseline'} tone={eventEnabled ? 'warn' : 'default'} />
+              </div>
+
+              <div className="rounded-lg border p-3">
+                <div className="text-[12px] text-[var(--muted)]">Forecast band</div>
+                <div className="mt-2">
+                  {points.map((p) => (
+                    <div key={p.horizon} className="flex items-center justify-between text-sm">
+                      <div className="text-[13px]">+{p.horizon}m</div>
+                      <div className="text-[13px] font-medium">{p.speed} km/h</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </Panel>
       </div>

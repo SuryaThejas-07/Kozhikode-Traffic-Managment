@@ -105,3 +105,31 @@ textarea {
   50% { opacity: 1; }
   100% { opacity: 0.72; }
 }
+
+/* Accessibility helpers */
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -40px;
+  background: #0b1220;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  z-index: 60;
+  transition: top 160ms ease;
+}
+.skip-link:focus {
+  top: 1rem;
+  outline: 3px solid #fff;
+}
+
+/* better focus styles for keyboard users */
+:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent) 80%, white 20%);
+  outline-offset: 2px;
+}
+
+/* mobile sidebar overlay helper */
+.mobile-drawer-backdrop {
+  background: rgba(2,6,23,0.6);
+}

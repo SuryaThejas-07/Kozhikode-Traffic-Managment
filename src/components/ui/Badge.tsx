@@ -1,4 +1,6 @@
-export function Badge({ children, tone = 'default' }: { children: string; tone?: 'default' | 'success' | 'warn' | 'danger' | 'accent' }) {
+import type { ReactNode } from 'react';
+
+export function Badge({ children, tone = 'default' }: { children: ReactNode; tone?: 'default' | 'success' | 'warn' | 'danger' | 'accent' }) {
   const classes =
     tone === 'success'
       ? 'bg-[color:color-mix(in_srgb,var(--success)_12%,transparent)] text-[var(--success)] border-[color:color-mix(in_srgb,var(--success)_28%,var(--border))]'

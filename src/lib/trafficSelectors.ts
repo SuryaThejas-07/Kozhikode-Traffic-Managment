@@ -21,6 +21,6 @@ export const selectJunction = (items: JunctionNode[], selectedId: string | null 
 
 export const selectRoad = (items: RoadLink[], selectedId: string | null | undefined) => selectItemById(items, selectedId);
 
-export const selectIncident = (items: Incident[], selectedId: string | null | undefined) => selectItemById(items, selectedId);
+export const selectIncident = <T extends { id: string }>(items: T[], selectedId: string | null | undefined) => selectItemById(items, selectedId);
 
-export const selectEvent = (items: EventPlan[], selectedId: string | null | undefined) => selectItemById(items, selectedId);
+export const selectEvent = <T extends { id: string }>(items: T[], selectedId: string | null | undefined) => selectItemById(items, selectedId);

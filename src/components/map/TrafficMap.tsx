@@ -19,11 +19,11 @@ interface TrafficMapProps {
 const CENTER: [number, number] = [11.2588, 75.7804];
 
 const roadWidthByClass: Record<RoadLink['roadClass'], number> = {
-  arterial: 10,
-  collector: 8,
-  connector: 7,
-  bypass: 10,
-  transit: 10,
+  arterial: 18,
+  collector: 14,
+  connector: 12,
+  bypass: 18,
+  transit: 18,
 };
 
 const roadBaseColorByClass: Record<RoadLink['roadClass'], string> = {
@@ -114,7 +114,7 @@ export function TrafficMap({ className, roads = baseRoads, junctions = baseJunct
   const selectedRoadFrame = roadFrames.find((item) => item.road.id === selectedRoad?.id)?.frame ?? roadFrames[0]?.frame;
 
   return (
-    <div className={cn('relative overflow-hidden rounded-3xl border border-slate-200 bg-slate-950 shadow-panel', className)} style={{ height }}>
+    <div aria-label="Interactive traffic map showing roads and junctions" className={cn('relative overflow-hidden rounded-3xl border border-slate-200 bg-slate-950 shadow-panel', className)} style={{ height }}>
       <MapContainer
         center={CENTER}
         zoom={14}
@@ -126,12 +126,14 @@ export function TrafficMap({ className, roads = baseRoads, junctions = baseJunct
         zoomControl={false}
         attributionControl
         className="h-full w-full"
+        
         preferCanvas
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; OpenStreetMap contributors'
         />
+
 
         {roadFrames.map(({ road, frame }) => {
           const from = junctions.find((junction) => junction.id === road.from);
@@ -156,7 +158,7 @@ export function TrafficMap({ className, roads = baseRoads, junctions = baseJunct
                 lineJoin: 'round',
                 dashArray: road.eventSensitive && activeEventId === 'event-ems-match' ? '8 10' : undefined,
               }}
-              eventHandlers={interactive ? { click: () => { setSelectedLinkId(road.id); setSelectedJunctionId(road.to); } } : undefined}
+              eventHandlers={interactive ? { click: () => { setSelectedLinkId?.(road.id); setSelectedJunctionId(road.to); } } : undefined}
             >
               <Tooltip direction="top" sticky>
                 <div className="min-w-[220px] space-y-1.5 text-sm leading-5">
@@ -206,10 +208,11 @@ export function TrafficMap({ className, roads = baseRoads, junctions = baseJunct
                 radius={pulse}
                 pathOptions={{ color: tone, fillColor: tone, fillOpacity: 0.08, weight: 0 }}
               />
-              <Marker
+              <CircleMarker
                 key={junction.id}
-                position={[junction.lat, junction.lng]}
-                icon={createNodeIcon(junction.signalClass)}
+                center={[junction.lat, junction.lng]}
+                radius={isActive ? 12 : 9}
+                pathOptions={{ color: '#0ea5e9', fillColor: '#0ea5e9', weight: 0, fillOpacity: 1 }}
                 eventHandlers={interactive ? { click: () => setSelectedJunctionId(junction.id) } : undefined}
               >
                 <Tooltip direction="top" sticky>
@@ -229,18 +232,18 @@ export function TrafficMap({ className, roads = baseRoads, junctions = baseJunct
                     <p>Speed: {frame.speed} km/h</p>
                   </div>
                 </Popup>
-              </Marker>
+              </CircleMarker>
             </>
           );
         })}
       </MapContainer>
 
-      <div className="pointer-events-none absolute left-4 top-4 rounded-2xl border border-white/10 bg-slate-950/75 px-4 py-3 text-xs text-slate-200 shadow-soft backdrop-blur-sm">
+      <div className="pointer-events-none absolute left-4 top-4 rounded-2xl border border-white/10 bg-slate-950/75 px-4 py-3 text-xs text-slate-200 shadow-soft backdrop-blur-sm hidden sm:block">
         <div className="font-semibold text-white">Kozhikode traffic network</div>
         <div>{filteredJunctions.length} junctions · {filteredRoads.length} road links</div>
       </div>
 
-      <div className="pointer-events-none absolute right-4 top-4 rounded-2xl border border-white/10 bg-slate-950/75 px-4 py-3 text-xs text-slate-200 shadow-soft backdrop-blur-sm">
+      <div className="pointer-events-none absolute right-4 top-4 rounded-2xl border border-white/10 bg-slate-950/75 px-4 py-3 text-xs text-slate-200 shadow-soft backdrop-blur-sm hidden md:block">
         <div className="space-y-1">
           <div><span className="inline-block h-2.5 w-2.5 rounded-full bg-emerald-500" /> Smooth</div>
           <div><span className="inline-block h-2.5 w-2.5 rounded-full bg-amber-400" /> Moderate</div>
@@ -250,7 +253,7 @@ export function TrafficMap({ className, roads = baseRoads, junctions = baseJunct
       </div>
 
       {selectedRoad && selectedRoadFrame ? (
-        <div className="pointer-events-none absolute left-4 bottom-4 z-20 w-[min(320px,calc(100vw-2rem))]">
+        <div className="pointer-events-none absolute left-4 bottom-4 z-20 w-[min(320px,calc(100vw-2rem))] sm:w-[min(420px,calc(100vw-2rem))] md:w-[min(520px,calc(100vw-4rem))] lg:w-[min(640px,calc(100vw-4rem))]">
           <div className="rounded-2xl border border-slate-800 bg-slate-950/95 px-4 py-3 text-slate-100 shadow-xl shadow-black/40 backdrop-blur-md">
             <div className="text-[14px] font-semibold leading-5 text-amber-300">{selectedRoad.corridor}</div>
             <div className="text-[11px] uppercase tracking-[0.2em] text-slate-400">{selectedRoad.name}</div>

@@ -9,6 +9,10 @@ export const simulateRoadFrame = (road: RoadLink, tick: number, pressure = 0) =>
   const queueLength = Math.round(road.queueLength + congestionIndex * 20 + Math.sin(tick / 3) * 3);
   const predictedDelay = clamp(road.predictedDelay + congestionIndex * 5 + pressure * 10, 0, 38);
   const occupancy = clamp(road.occupancy + congestionIndex * 0.1 + pressure * 0.08, 0.08, 0.99);
+  const volume = Math.round(Math.max(80, (50 - speed) * 12 + (road.density || 0) * 200));
+  const los = speed >= 50 ? 'A' : speed >= 40 ? 'B' : speed >= 32 ? 'C' : speed >= 22 ? 'D' : speed >= 14 ? 'E' : 'F';
+  const predicted_speed_15m = Math.round(Math.max(5, speed * 0.95));
+  const ai_confidence = Math.round(((road.aiConfidence ?? 0.88) * 100)) / 100;
 
   return {
     ...road,
@@ -16,10 +20,14 @@ export const simulateRoadFrame = (road: RoadLink, tick: number, pressure = 0) =>
     density: roundTo(density, 2),
     speed: roundTo(speed, 1),
     queueLength,
+    volume,
     predictedDelay: roundTo(predictedDelay, 1),
     occupancy: roundTo(occupancy, 2),
     trafficState: congestionToCondition(congestionIndex),
     congestionColor: congestionToColor(congestionIndex),
+    los,
+    predicted_speed_15m,
+    ai_confidence,
   };
 };
 

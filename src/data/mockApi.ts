@@ -25,7 +25,20 @@ export const mockApi = {
   },
   async getIncidents() {
     await pause(110);
-    return incidents;
+    return incidents.map((inc) => {
+      const mappedStatus: 'active' | 'responding' | 'resolved' = inc.status === 'investigating' || inc.status === 'open' ? 'active' : inc.status === 'mitigated' ? 'responding' : 'resolved';
+      return {
+      id: inc.id,
+      type: 'roadblock' as const,
+      severity: inc.severity,
+      node_id: inc.junctionId,
+      affected_links: [],
+      status: mappedStatus,
+      reported_at: Date.parse(inc.reportedAt || ''),
+      title: inc.title,
+      note: inc.description || '',
+      };
+    });
   },
   async getEvents() {
     await pause(110);

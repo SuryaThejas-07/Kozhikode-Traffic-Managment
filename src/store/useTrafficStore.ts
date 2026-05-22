@@ -6,6 +6,7 @@ type LayerKey = 'traffic' | 'nodes' | 'signals' | 'incidents' | 'events' | 'pred
 type TrafficStore = {
   clockTick: number;
   selectedJunctionId: string;
+  selectedLinkId?: string;
   activeLayers: Record<LayerKey, boolean>;
   forecastHorizon: number;
   timelineStep: number;
@@ -19,6 +20,7 @@ type TrafficStore = {
   setSelectedEventId: (eventId: string) => void;
   setSelectedIncidentId: (incidentId: string) => void;
   setSearchQuery: (query: string) => void;
+  setSelectedLinkId?: (linkId: string) => void;
   bumpClockTick: () => void;
 };
 
@@ -37,6 +39,7 @@ export const useTrafficStore = create<TrafficStore>((set) => ({
   timelineStep: 2,
   selectedEventId: events[0]?.id ?? 'event-ems-match',
   selectedIncidentId: 'incident-stadium-overflow',
+  selectedLinkId: undefined,
   searchQuery: '',
   setSelectedJunctionId: (junctionId) => set({ selectedJunctionId: junctionId }),
   toggleLayer: (layer) =>
@@ -51,5 +54,6 @@ export const useTrafficStore = create<TrafficStore>((set) => ({
   setSelectedEventId: (selectedEventId) => set({ selectedEventId }),
   setSelectedIncidentId: (selectedIncidentId) => set({ selectedIncidentId }),
   setSearchQuery: (searchQuery) => set({ searchQuery }),
+  setSelectedLinkId: (selectedLinkId) => set({ selectedLinkId }),
   bumpClockTick: () => set((state) => ({ clockTick: state.clockTick + 1 })),
 }));
